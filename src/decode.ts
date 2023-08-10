@@ -11,38 +11,58 @@ function bytes(text: string): number[] {
 }
 
 export function cast(field: Field, value: string | null): any {
-  if (value === '' || value == null) {
-    return value
+  if (value == null) {
+    return null
   }
 
   switch (field.type) {
+    case 'TINYINT':
+    case 'UNSIGNED TINYINT':
+    case 'SMALLINT':
+    case 'UNSIGNED SMALLINT':
+    case 'MEDIUMINT':
     case 'INT':
-    case 'INT8':
-    case 'INT16':
-    case 'INT24':
-    case 'INT32':
-    case 'UINT8':
-    case 'UINT16':
-    case 'UINT24':
-    case 'UINT32':
+    case 'UNSIGNED INT':
     case 'YEAR':
+      if (value === '') {
+        return null
+      }
       return parseInt(value, 10)
-    case 'FLOAT32':
-    case 'FLOAT64':
+    case 'FLOAT':
+    case 'DOUBLE':
+      if (value === '') {
+        return null
+      }
       return parseFloat(value)
     case 'DECIMAL':
-    case 'INT64':
-    case 'UINT64':
+    case 'BIGINT':
+    case 'UNSIGNED BIGINT':
+    case 'CHAR':
+    case 'VARCHAR':
+    case 'BINARY':
+    case 'VARBINARY':
+    case 'TINYTEXT':
+    case 'TEXT':
+    case 'MEDIUMTEXT':
+    case 'LONGTEXT':
+    case 'TINYBLOB':
+    case 'BLOB':
+    case 'MEDIUMBLOB':
+    case 'LONGBLOB':
     case 'DATE':
     case 'TIME':
     case 'DATETIME':
     case 'TIMESTAMP':
-    case 'BLOB':
     case 'BIT':
-    case 'VARBINARY':
-    case 'BINARY':
+      // can not distinguish between empty string and null for nullable fields now.
+      if (value === '' && !field.nullable) {
+        return null
+      }
       return value
     case 'JSON':
+      if (value === '') {
+        return null
+      }
       return JSON.parse(decode(value))
     default:
       return decode(value)

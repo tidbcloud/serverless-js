@@ -4,10 +4,12 @@ import { DatabaseError } from './error.js'
 import { Config, ExecuteOptions, ExecuteArgs } from './config.js'
 import { postQuery } from './serverless.js'
 
+export { Config, ExecuteOptions, ExecuteArgs,DatabaseError }
+
 // serverless driver returns a full result by default
-type Row = Record<string, any> | any[]
-type Types = Record<string, string>
-interface FullResult {
+export type Row = Record<string, any> | any[]
+export type Types = Record<string, string>
+export interface FullResult {
   types: Types | null
   rows: Row[] | null
   statement: string
@@ -70,12 +72,21 @@ class Connection {
 
     if (config.url) {
       const url = new URL(config.url)
-      this.config.username = url.username
-      this.config.password = url.password
-      this.config.host = url.hostname
-      this.config.database = url.pathname.slice(1)
+      if (!this.config.username) {
+        this.config.username = url.username
+      }
+      if (!this.config.password) {
+        this.config.password = url.password
+      }
+      if (!this.config.host) {
+        this.config.host = url.hostname
+      }
+      if (!this.config.database) {
+        this.config.database = url.pathname.slice(1)
+      }
     }
   }
+
 
   async begin(): Promise<Tx> {
     const conn = new Connection(this.config)
