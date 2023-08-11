@@ -20,4 +20,5 @@ jobs:
             ${{ runner.os }}-node-
       - run: |
           npm ci
+          export DATABASE_URL=${{ secrets.DATABASE_URL }}
           npm run integrationTest

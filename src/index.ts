@@ -4,7 +4,7 @@ import { DatabaseError } from './error.js'
 import { Config, ExecuteOptions, ExecuteArgs } from './config.js'
 import { postQuery } from './serverless.js'
 
-export { Config, ExecuteOptions, ExecuteArgs,DatabaseError }
+export { Config, ExecuteOptions, ExecuteArgs, DatabaseError }
 
 // serverless driver returns a full result by default
 export type Row = Record<string, any> | any[]
@@ -86,7 +86,6 @@ class Connection {
       }
     }
   }
-
 
   async begin(): Promise<Tx> {
     const conn = new Connection(this.config)

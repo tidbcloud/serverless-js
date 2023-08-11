@@ -11,7 +11,7 @@ function bytes(text: string): number[] {
 }
 
 export function cast(field: Field, value: string | null): any {
-  if (isNull(value, field)){
+  if (isNull(value, field)) {
     return null
   }
 
@@ -29,10 +29,10 @@ export function cast(field: Field, value: string | null): any {
     case 'FLOAT':
     case 'DOUBLE':
       return parseFloat(value)
+    // set and enum will be converted to char.
     case 'BIGINT':
     case 'UNSIGNED BIGINT':
     case 'DECIMAL':
-    // set and enum will be converted to char.
     case 'CHAR':
     case 'VARCHAR':
     case 'BINARY':
@@ -85,7 +85,7 @@ function isNull(value, field: Field): boolean {
     case 'DATETIME':
     case 'TIMESTAMP':
     case 'JSON':
-        return true
+      return true
     // set and enum will be converted to char.
     case 'CHAR':
     case 'VARCHAR':
