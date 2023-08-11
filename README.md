@@ -136,9 +136,9 @@ The following SQL statements are supported:  `Select`, `Show`, `Explain`, `Use`,
 
 And most of the DDL are supported.
 
-### Data Type
+### Data Type Mapping
 
-The type mapping between TiDB and Javascript:
+The type mapping between TiDB and Javascript is as follows:
 
 | TiDB Type         | Javascript Type |
 |-------------------|-----------------|
@@ -178,4 +178,4 @@ The type mapping between TiDB and Javascript:
 | JSON              | any             |
 | Others            | string          |
 
-The following types can not be distinguished between empty string and null if it is nullable: `CHAR`, `VARCHAR`, `BINARY`, `VARBINARY`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `TINYBLOB`, `BLOB`, `MEDIUMBLOB`, `LONGBLOB`, `ENUM`, `SET`, `BIT`.
+> The following types can not be distinguished between empty string and null if it is nullable: `CHAR`, `VARCHAR`, `BINARY`, `VARBINARY`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `TINYBLOB`, `BLOB`, `MEDIUMBLOB`, `LONGBLOB`, `ENUM`, `SET`, `BIT`.
