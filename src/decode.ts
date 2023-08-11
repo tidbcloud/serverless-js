@@ -11,11 +11,12 @@ function bytes(text: string): number[] {
 }
 
 export function cast(field: Field, value: string | null): any {
-  if (value == null) {
+  if (isNull(value, field)){
     return null
   }
 
   switch (field.type) {
+    // bool will be converted to TINYINT
     case 'TINYINT':
     case 'UNSIGNED TINYINT':
     case 'SMALLINT':
@@ -24,19 +25,14 @@ export function cast(field: Field, value: string | null): any {
     case 'INT':
     case 'UNSIGNED INT':
     case 'YEAR':
-      if (value === '') {
-        return null
-      }
       return parseInt(value, 10)
     case 'FLOAT':
     case 'DOUBLE':
-      if (value === '') {
-        return null
-      }
       return parseFloat(value)
-    case 'DECIMAL':
     case 'BIGINT':
     case 'UNSIGNED BIGINT':
+    case 'DECIMAL':
+    // Set and enum will be converted to char.
     case 'CHAR':
     case 'VARCHAR':
     case 'BINARY':
@@ -54,17 +50,58 @@ export function cast(field: Field, value: string | null): any {
     case 'DATETIME':
     case 'TIMESTAMP':
     case 'BIT':
-      // can not distinguish between empty string and null for nullable fields now.
-      if (value === '' && !field.nullable) {
-        return null
-      }
       return value
     case 'JSON':
-      if (value === '') {
-        return null
-      }
       return JSON.parse(decode(value))
     default:
       return decode(value)
+  }
+}
+
+function isNull(value, field: Field): boolean {
+  if (value === null) {
+    return true
+  }
+  if (value != '') {
+    return false
+  }
+
+  switch (field.type) {
+    case 'TINYINT':
+    case 'UNSIGNED TINYINT':
+    case 'SMALLINT':
+    case 'UNSIGNED SMALLINT':
+    case 'MEDIUMINT':
+    case 'INT':
+    case 'UNSIGNED INT':
+    case 'YEAR':
+    case 'FLOAT':
+    case 'DOUBLE':
+    case 'BIGINT':
+    case 'UNSIGNED BIGINT':
+    case 'DECIMAL':
+    case 'DATE':
+    case 'TIME':
+    case 'DATETIME':
+    case 'TIMESTAMP':
+    case 'JSON':
+        return true
+    case 'CHAR':
+    case 'VARCHAR':
+    case 'BINARY':
+    case 'VARBINARY':
+    case 'TINYTEXT':
+    case 'TEXT':
+    case 'MEDIUMTEXT':
+    case 'LONGTEXT':
+    case 'TINYBLOB':
+    case 'BLOB':
+    case 'MEDIUMBLOB':
+    case 'LONGBLOB':
+    case 'BIT':
+      // can not distinguish between empty string and null for nullable fields now.
+      return false
+    default:
+      return false
   }
 }
