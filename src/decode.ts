@@ -11,40 +11,98 @@ function bytes(text: string): number[] {
 }
 
 export function cast(field: Field, value: string | null): any {
-  if (value === '' || value == null) {
-    return value
+  if (isNull(value, field)) {
+    return null
   }
 
   switch (field.type) {
+    // bool will be converted to TINYINT
+    case 'TINYINT':
+    case 'UNSIGNED TINYINT':
+    case 'SMALLINT':
+    case 'UNSIGNED SMALLINT':
+    case 'MEDIUMINT':
     case 'INT':
-    case 'INT8':
-    case 'INT16':
-    case 'INT24':
-    case 'INT32':
-    case 'UINT8':
-    case 'UINT16':
-    case 'UINT24':
-    case 'UINT32':
+    case 'UNSIGNED INT':
     case 'YEAR':
       return parseInt(value, 10)
-    case 'FLOAT32':
-    case 'FLOAT64':
+    case 'FLOAT':
+    case 'DOUBLE':
       return parseFloat(value)
+    // set and enum will be converted to char.
+    case 'BIGINT':
+    case 'UNSIGNED BIGINT':
     case 'DECIMAL':
-    case 'INT64':
-    case 'UINT64':
+    case 'CHAR':
+    case 'VARCHAR':
+    case 'BINARY':
+    case 'VARBINARY':
+    case 'TINYTEXT':
+    case 'TEXT':
+    case 'MEDIUMTEXT':
+    case 'LONGTEXT':
+    case 'TINYBLOB':
+    case 'BLOB':
+    case 'MEDIUMBLOB':
+    case 'LONGBLOB':
     case 'DATE':
     case 'TIME':
     case 'DATETIME':
     case 'TIMESTAMP':
-    case 'BLOB':
     case 'BIT':
-    case 'VARBINARY':
-    case 'BINARY':
       return value
     case 'JSON':
       return JSON.parse(decode(value))
     default:
       return decode(value)
+  }
+}
+
+function isNull(value, field: Field): boolean {
+  if (value === null) {
+    return true
+  }
+  if (value != '') {
+    return false
+  }
+
+  switch (field.type) {
+    case 'TINYINT':
+    case 'UNSIGNED TINYINT':
+    case 'SMALLINT':
+    case 'UNSIGNED SMALLINT':
+    case 'MEDIUMINT':
+    case 'INT':
+    case 'UNSIGNED INT':
+    case 'YEAR':
+    case 'FLOAT':
+    case 'DOUBLE':
+    case 'BIGINT':
+    case 'UNSIGNED BIGINT':
+    case 'DECIMAL':
+    case 'DATE':
+    case 'TIME':
+    case 'DATETIME':
+    case 'TIMESTAMP':
+    case 'JSON':
+      return true
+    // set and enum will be converted to char.
+    case 'CHAR':
+    case 'VARCHAR':
+    case 'BINARY':
+    case 'VARBINARY':
+    case 'TINYTEXT':
+    case 'TEXT':
+    case 'MEDIUMTEXT':
+    case 'LONGTEXT':
+    case 'TINYBLOB':
+    case 'BLOB':
+    case 'MEDIUMBLOB':
+    case 'LONGBLOB':
+    case 'BIT':
+      // can not distinguish between empty string and null for nullable fields now.
+      return false
+    default:
+      return false
   }
 }

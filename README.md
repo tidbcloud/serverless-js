@@ -2,6 +2,7 @@
 
 This driver is for serverless and edge compute platforms that require HTTP external connections, such as Vercel Edge Functions or Cloudflare Workers.
 
+
 ## Installation
 
 ```
@@ -126,3 +127,55 @@ const config = {
 const conn = connect(config)
 const results = await conn.execute('select 1 from test',null,{arrayMode:true,fullResult:true})
 ```
+
+## Features
+
+### Supported SQL
+
+The following SQL statements are supported:  `Select`, `Show`, `Explain`, `Use`, `Insert`, `Update`, `Delete`, `Begin`, `Commit`, `Rollback`.
+
+And most of the DDL are supported.
+
+### Data Type Mapping
+
+The type mapping between TiDB and Javascript is as follows:
+
+| TiDB Type         | Javascript Type |
+|-------------------|-----------------|
+| TINYINT           | number          |
+| UNSIGNED TINYINT  | number          |
+| BOOL              | number          |
+| SMALLINT          | number          |
+| UNSIGNED SMALLINT | number          |
+| MEDIUMINT         | number          |
+| INT               | number          |
+| UNSIGNED INT      | number          |
+| YEAR              | number          |
+| FLOAT             | number          |
+| DOUBLE            | number          |
+| BIGINT            | string          |
+| UNSIGNED BIGINT   | string          |
+| DECIMAL           | string          |
+| CHAR              | string          |
+| VARCHAR           | string          |
+| BINARY            | string          |
+| VARBINARY         | string          |
+| TINYTEXT          | string          |
+| TEXT              | string          |
+| MEDIUMTEXT        | string          |
+| LONGTEXT          | string          |
+| TINYBLOB          | string          |
+| BLOB              | string          |
+| MEDIUMBLOB        | string          |
+| LONGBLOB          | string          |
+| DATE              | string          |
+| TIME              | string          |
+| DATETIME          | string          |
+| TIMESTAMP         | string          |
+| ENUM              | string          |
+| SET               | string          |
+| BIT               | string          |
+| JSON              | any             |
+| Others            | string          |
+
+> The following types can not be distinguished between empty string and null if it is nullable: `CHAR`, `VARCHAR`, `BINARY`, `VARBINARY`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `TINYBLOB`, `BLOB`, `MEDIUMBLOB`, `LONGBLOB`, `ENUM`, `SET`, `BIT`.
