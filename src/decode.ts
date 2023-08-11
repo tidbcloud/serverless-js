@@ -32,7 +32,7 @@ export function cast(field: Field, value: string | null): any {
     case 'BIGINT':
     case 'UNSIGNED BIGINT':
     case 'DECIMAL':
-    // Set and enum will be converted to char.
+    // set and enum will be converted to char.
     case 'CHAR':
     case 'VARCHAR':
     case 'BINARY':
@@ -86,6 +86,7 @@ function isNull(value, field: Field): boolean {
     case 'TIMESTAMP':
     case 'JSON':
         return true
+    // set and enum will be converted to char.
     case 'CHAR':
     case 'VARCHAR':
     case 'BINARY':
