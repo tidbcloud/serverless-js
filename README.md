@@ -178,3 +178,7 @@ The type mapping between TiDB and Javascript is as follows:
 | JSON              | object          |
 | NULL              | null            |
 | Others            | string          |
+
+# Limitations
+
+- Up to 10,000 rows can be fetched in a single query.
