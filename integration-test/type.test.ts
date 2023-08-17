@@ -61,26 +61,26 @@ const nullResult =    {
   t_float: null,
   t_double: null,
   t_decimal: null,
-  t_char: '',
-  t_varchar: '',
-  c_binary: '',
-  c_varbinary: '',
-  t_tinytext: '',
-  t_text: '',
-  t_mediumtext: '',
-  t_longtext: '',
-  t_tinyblob: '',
-  t_blob: '',
-  t_mediumblob: '',
-  t_longblob: '',
+  t_char: null,
+  t_varchar: null,
+  c_binary: null,
+  c_varbinary: null,
+  t_tinytext: null,
+  t_text: null,
+  t_mediumtext: null,
+  t_longtext: null,
+  t_tinyblob: null,
+  t_blob: null,
+  t_mediumblob: null,
+  t_longblob: null,
   t_date: null,
   t_datetime: null,
   t_timestamp: null,
   t_time: null,
   t_year: null,
-  t_enum: '',
-  t_set: '',
-  t_bit: '',
+  t_enum: null,
+  t_set: null,
+  t_bit: null,
   t_json: null
 }
 
@@ -94,7 +94,7 @@ INSERT INTO ${database}.${table}( t_tinyint, t_tinyint_unsigned, t_smallint, t_s
                            , t_enum,t_bit, t_set, t_json)
 VALUES ( -128, 255, -32768, 65535, -8388608, 16777215, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615
        , true, 123.456, 123.123, 123456789012.123456789012
-       , '测', '测试', x'89504E470D0A1A0A', x'89504E470D0A1A0A', '测试tinytext', '测试text', '测试mediumtext', '测试longtext'
+       , '测', '测试', x'89504E470D0A1A0A', x'89504E470D0A1A0A', '测试tinytext', '0', '测试mediumtext', '测试longtext'
        , 'tinyblob', 'blob', 'mediumblob', 'longblob'
        , '1977-01-01', '9999-12-31 23:59:59', '19731230153000', '23:59:59', '2154'
        , 'enum2',b'01010101', 'a,b','{"a":1,"b":"2"}')
@@ -120,7 +120,7 @@ const fullTypeResult = {
       c_binary: '�PNG\r\n\x1A\n\x00\x00\x00\x00\x00\x00\x00\x00',
       c_varbinary: '�PNG\r\n\x1A\n',
       t_tinytext: '测试tinytext',
-      t_text: '测试text',
+      t_text: '0',
       t_mediumtext: '测试mediumtext',
       t_longtext: '测试longtext',
       t_tinyblob: 'tinyblob',
@@ -153,7 +153,6 @@ describe('types', () => {
     await con.execute('insert into multi_data_type values ()')
     const r = await con.execute('select * from multi_data_type',null, {fullResult: true}) as FullResult
     expect(r.rows.length).toEqual(1)
-    const row = r.rows[0] as Record<string, any>
     expect(JSON.stringify(r.rows[0])).toEqual(JSON.stringify(nullResult))
   })
 
