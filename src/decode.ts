@@ -11,7 +11,7 @@ function bytes(text: string): number[] {
 }
 
 export function cast(field: Field, value: string | null): any {
-  if (isNull(value, field)) {
+  if (isNull(value)) {
     return null
   }
 
@@ -58,51 +58,8 @@ export function cast(field: Field, value: string | null): any {
   }
 }
 
-function isNull(value, field: Field): boolean {
+function isNull(value): boolean {
   if (value === null) {
     return true
-  }
-  if (value != '') {
-    return false
-  }
-
-  switch (field.type) {
-    case 'TINYINT':
-    case 'UNSIGNED TINYINT':
-    case 'SMALLINT':
-    case 'UNSIGNED SMALLINT':
-    case 'MEDIUMINT':
-    case 'INT':
-    case 'UNSIGNED INT':
-    case 'YEAR':
-    case 'FLOAT':
-    case 'DOUBLE':
-    case 'BIGINT':
-    case 'UNSIGNED BIGINT':
-    case 'DECIMAL':
-    case 'DATE':
-    case 'TIME':
-    case 'DATETIME':
-    case 'TIMESTAMP':
-    case 'JSON':
-      return true
-    // set and enum will be converted to char.
-    case 'CHAR':
-    case 'VARCHAR':
-    case 'BINARY':
-    case 'VARBINARY':
-    case 'TINYTEXT':
-    case 'TEXT':
-    case 'MEDIUMTEXT':
-    case 'LONGTEXT':
-    case 'TINYBLOB':
-    case 'BLOB':
-    case 'MEDIUMBLOB':
-    case 'LONGBLOB':
-    case 'BIT':
-      // can not distinguish between empty string and null for nullable fields now.
-      return false
-    default:
-      return false
   }
 }
