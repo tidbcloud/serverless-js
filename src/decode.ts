@@ -11,7 +11,6 @@ function bytes(text: string): number[] {
 }
 
 export function cast(field: Field, value: string | null): any {
-
   if (isNull(value)) {
     return null
   }
