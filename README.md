@@ -175,7 +175,10 @@ The type mapping between TiDB and Javascript is as follows:
 | ENUM              | string          |
 | SET               | string          |
 | BIT               | string          |
-| JSON              | any             |
+| JSON              | object          |
+| NULL              | null            |
 | Others            | string          |
 
-> The following types can not be distinguished between empty string and null if it is nullable: `CHAR`, `VARCHAR`, `BINARY`, `VARBINARY`, `TINYTEXT`, `TEXT`, `MEDIUMTEXT`, `LONGTEXT`, `TINYBLOB`, `BLOB`, `MEDIUMBLOB`, `LONGBLOB`, `ENUM`, `SET`, `BIT`.
+# Limitations
+
+- Up to 10,000 rows can be fetched in a single query.
