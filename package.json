@@ -19,7 +19,7 @@
     "pretest": "npm run build",
     "test": "jest __tests__ --passWithNoTests",
     "integrationTest": "npm run build && jest integration-test --passWithNoTests",
-    "version": "echo \"export const Version = '$npm_package_version'\" > src/version.ts && git add src/version.ts && npm run build",
+    "version": "echo \"export const Version = '$npm_package_version'\" > src/version.ts",
     "prepublishOnly": "npm run build"
   },
   "prettier": {
