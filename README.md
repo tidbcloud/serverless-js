@@ -3,7 +3,7 @@
 This driver is for serverless and edge compute platforms that require HTTP external connections, such as Vercel Edge Functions or Cloudflare Workers.
 
 
-## Installation (Unpublished)
+## Installation
 
 ```
 npm install @tidbcloud/serverless
