@@ -26,3 +26,11 @@ jobs:
             git diff
             exit 1
           fi
+      - run: |
+          npm run version
+          if [ "$(git diff | wc -l)" -gt "0" ]; then
+            echo "Check version fail, please run 'npm run version' to fix."
+            git diff
+            exit 1
+          fi    
+          

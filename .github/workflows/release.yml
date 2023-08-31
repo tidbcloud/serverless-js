@@ -1,17 +1,19 @@
 name: Release
+
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: cgetc/create-github-release-simply@v0.1.0
         with:
-          node-version: '16.x'
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          name: ${GITHUB_REF#refs/tags/}
+          generate-release-notes: true
+          draft: true
+
