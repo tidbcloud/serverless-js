@@ -38,7 +38,7 @@ const defaultExecuteOptions: ExecuteOptions = {
   fullResult: false
 }
 
-class Tx {
+export class Tx {
   private conn: Connection
 
   constructor(conn: Connection) {
@@ -58,7 +58,7 @@ class Tx {
   }
 }
 
-class Connection {
+export class Connection {
   private config: Config
   private session: Session
 
