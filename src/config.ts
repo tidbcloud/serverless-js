@@ -20,6 +20,8 @@ export interface Config {
   database?: string
   host?: string
   fetch?: (input: string, init?: Req) => Promise<Res>
+  arrayMode?: boolean
+  fullResult?: boolean
 }
 
 export interface ExecuteOptions {
