@@ -103,17 +103,18 @@ export class Connection {
     if (this.session === null) {
       throw new DatabaseError('empty session, please try again', 500, null)
     }
-    const rowsAffected = resp?.rowsAffected ?? 0
-    const lastInsertId = resp?.lastInsertID ?? null
+
+    const arrayMode = options.arrayMode ?? this.config.arrayMode ?? false
+    const fullResult = options.fullResult ?? this.config.arrayMode ?? false
 
     const fields = resp?.types ?? []
-    const typeByName = (acc, { name, type }) => ({ ...acc, [name]: type })
-    const types = fields.reduce<Types>(typeByName, {})
+    const rows = resp ? parse(fields, resp?.rows ?? [], cast, arrayMode) : []
 
-    const datas = resp?.rows ?? []
-    const rows = resp ? parse(fields, datas, cast, options.arrayMode || false) : []
-
-    if (options.fullResult) {
+    if (fullResult) {
+      const rowsAffected = resp?.rowsAffected ?? 0
+      const lastInsertId = resp?.lastInsertID ?? null
+      const typeByName = (acc, { name, type }) => ({ ...acc, [name]: type })
+      const types = fields.reduce<Types>(typeByName, {})
       return {
         statement: sql,
         types,

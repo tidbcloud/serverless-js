@@ -2,57 +2,37 @@
 
 This driver is for serverless and edge compute platforms that require HTTP external connections, such as Vercel Edge Functions or Cloudflare Workers.
 
+## Usage
 
-## Installation
+**Install**
 
-```
+You can install the driver with npm:
+
+```bash
 npm install @tidbcloud/serverless
 ```
 
-## Usage
+**Query**
+
+To query from TiDB serverless, you need to create a connection first. Then you can use the connection to execute raw SQL queries. For example:
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
 
-const config = {
-  host: '<host>',
-  username: '<user>',
-  password: '<password>'
-}
-
-const conn = connect(config)
-const results = await conn.execute('select 1 from test')
+const conn = connect({url: 'mysql://username:password@host/database'})
+const results = await conn.execute('select * from test where id = ?',[1])
 ```
 
-Query with placeholder:
+**Transaction (Experimental)**
+
+You can also perform interactive transactions with the TiDB serverless driver. For example:
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
 
-const config = {
-  host: '<host>',
-  username: '<user>',
-  password: '<password>'
-}
-
-const conn = connect(config)
-const results = await conn.execute('select 1 from test where id = ?', [1])
-const results2 = await conn.execute('select 1 from test where id = :id', {id:1})
-```
-
-
-Use the `transaction` function to safely perform database transactions:
-
-```ts
-import { connect } from '@tidbcloud/serverless'
-
-const config = {
-  host: '<host>',
-  username: '<user>',
-  password: '<password>'
-}
-const conn = connect(config)
+const conn = connect({url: 'mysql://username:password@host/database'})
 const tx = await conn.begin()
+
 try {
   await tx.execute('insert into test values (1)')
   await tx.execute('select * from test')
@@ -63,51 +43,62 @@ try {
 }
 ```
 
+**Edge example**
+
+The serverless driver is suitable for the edge environments. See how to use it with Vercel Edge Functions:
+
+```
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { connect } from '@tidbcloud/serverless'
+export const runtime = 'edge'
+
+export async function GET(request: NextRequest) {
+  const conn = connect({url: process.env.DATABASE_URL})
+  const result = await conn.execute('show tables')
+  return NextResponse.json({result});
+}
+```
+
+See [TiDB serverless driver](https://docs.pingcap.com/tidbcloud/serverless-driver#edge-examples) documentation to learn more examples.
+
 ## Configuration
 
 The following configurations are supported in connection level:
 
-| name     | type     | default      | comment                                                          |
-|----------|----------|--------------|------------------------------------------------------------------|
-| username | string   | /            | Username of TiDB Severless                                       |
-| password | string   | /            | Password of TiDB Severless                                       |
-| host     | string   | /            | Host of TiDB Severless                                           |
-| database | string   | test         | Database of TiDB Severless                                       |
-| url      | string   | /            | A single url format as `mysql://username:password@host/database` |
-| fetch    | function | global fetch | Custom fetch function                                            |
+| name       | type      | default      | comment                                                          |
+|------------|-----------|--------------|------------------------------------------------------------------|
+| username   | string    | /            | Username of TiDB Severless                                       |
+| password   | string    | /            | Password of TiDB Severless                                       |
+| host       | string    | /            | Host of TiDB Severless                                           |
+| database   | string    | test         | Database of TiDB Severless                                       |
+| url        | string    | /            | A single url format as `mysql://username:password@host/database` |
+| fetch      | function  | global fetch | Custom fetch function                                            |
+| arrayMode  | bool      | false        | whether to return results as arrays instead of objects           |
+| fullResult | bool      | false        | whether to return full result object instead of just rows        |
 
 ### Database URL
 
-A single database URL value can be used to configure the `host`, `username`, `password` and `database` values:
+A single database URL value can be used to configure the `host`, `username`, `password` and `database` values. The following codes are equivalent:
+
+```ts
+const config = {
+  host: '<host>',
+  username: '<user>',
+  password: '<password>',
+  database: '<database>'
+}
+
+const conn = connect(config)
+```
 
 ```ts
 const conn = connect({url: process.env['DATABASE_URL'] || 'mysql://username:password@host/database'})
 ```
 
-Database can be skipped to use the default one:
-
-```ts
-const conn = connect({url: process.env['DATABASE_URL'] || 'mysql://username:password@host'})
-````
-
-### Custom fetch function
-
-You can custom fetch function instead of using the global one. It's useful when you run in the environment without a built-in global `fetch` function. For example, an older version of Node.js.
-
-```ts
-import { connect } from '@tidbcloud/serverless'
-import { fetch } from 'undici'
-
-const config = {
-  fetch,
-  url: process.env['DATABASE_URL'] || 'mysql://username:password@host/database'
-}
-
-const conn = connect(config)
-const results = await conn.execute('select 1 from test')
-```
-
 ## Options
+
+> Note: SQL level options priority is higher than connection level configurations.
 
 The following options are supported in SQL level:
 
@@ -128,57 +119,10 @@ const conn = connect(config)
 const results = await conn.execute('select 1 from test',null,{arrayMode:true,fullResult:true})
 ```
 
-## Features
+## Documentation
 
-### Supported SQL
+See [TiDB serverless driver](https://docs.pingcap.com/tidbcloud/serverless-driver) documentation to learn more.
 
-The following SQL statements are supported:  `Select`, `Show`, `Explain`, `Use`, `Insert`, `Update`, `Delete`, `Begin`, `Commit`, `Rollback`.
+## License
 
-And most of the DDL are supported.
-
-### Data Type Mapping
-
-The type mapping between TiDB and Javascript is as follows:
-
-| TiDB Type         | Javascript Type |
-|-------------------|-----------------|
-| TINYINT           | number          |
-| UNSIGNED TINYINT  | number          |
-| BOOL              | number          |
-| SMALLINT          | number          |
-| UNSIGNED SMALLINT | number          |
-| MEDIUMINT         | number          |
-| INT               | number          |
-| UNSIGNED INT      | number          |
-| YEAR              | number          |
-| FLOAT             | number          |
-| DOUBLE            | number          |
-| BIGINT            | string          |
-| UNSIGNED BIGINT   | string          |
-| DECIMAL           | string          |
-| CHAR              | string          |
-| VARCHAR           | string          |
-| BINARY            | string          |
-| VARBINARY         | string          |
-| TINYTEXT          | string          |
-| TEXT              | string          |
-| MEDIUMTEXT        | string          |
-| LONGTEXT          | string          |
-| TINYBLOB          | string          |
-| BLOB              | string          |
-| MEDIUMBLOB        | string          |
-| LONGBLOB          | string          |
-| DATE              | string          |
-| TIME              | string          |
-| DATETIME          | string          |
-| TIMESTAMP         | string          |
-| ENUM              | string          |
-| SET               | string          |
-| BIT               | string          |
-| JSON              | object          |
-| NULL              | null            |
-| Others            | string          |
-
-# Limitations
-
-- Up to 10,000 rows can be fetched in a single query.
+Apache 2.0, see [LICENSE](./LICENSE).
