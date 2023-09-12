@@ -9,6 +9,7 @@ type Res = {
   ok: boolean
   status: number
   statusText: string
+  headers: any
   json(): Promise<any>
   text(): Promise<string>
 }
