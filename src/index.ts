@@ -100,7 +100,7 @@ export class Connection {
     const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '')
 
     this.session = resp?.session ?? null
-    if (this.session === null) {
+    if (this.session === null || this.session === '') {
       throw new DatabaseError('empty session, please try again', 500, null)
     }
 
