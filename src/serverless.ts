@@ -29,7 +29,7 @@ export async function postQuery<T>(config: Config, body, session = ''): Promise<
 
   if (response.ok) {
     const resp = await response.json()
-    const session = response.headers.get('tidb-session')
+    const session = response.headers.get('TiDB-Session')
     resp.session = session ?? ''
     return resp
   } else {
