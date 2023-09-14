@@ -25,7 +25,7 @@ const results = await conn.execute('select * from test where id = ?',[1])
 
 **Transaction (Experimental)**
 
-You can also perform interactive transactions with the TiDB Serverless driver. For example:
+You can also perform interactive transactions with the serverless driver. For example:
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
@@ -60,11 +60,11 @@ export async function GET(request: NextRequest) {
 }
 ```
 
-See [TiDB Serverless driver](https://docs.pingcap.com/tidbcloud/serverless-driver#edge-examples) documentation to learn more.
+See [TiDB Cloud Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver#edge-examples) documentation to learn more.
 
 ## Configuration
 
-See [Configure TiDB Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver-config).
+See [Configure TiDB Cloud Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver-config).
 
 ## License
 
