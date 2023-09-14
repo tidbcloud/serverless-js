@@ -14,7 +14,7 @@ npm install @tidbcloud/serverless
 
 **Query**
 
-To query from TiDB serverless, you need to create a connection first. Then you can use the connection to execute raw SQL queries. For example:
+To query from TiDB Serverless, you need to create a connection first. Then you can use the connection to execute raw SQL queries. For example:
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
@@ -25,7 +25,7 @@ const results = await conn.execute('select * from test where id = ?',[1])
 
 **Transaction (Experimental)**
 
-You can also perform interactive transactions with the TiDB serverless driver. For example:
+You can also perform interactive transactions with the TiDB Serverless driver. For example:
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
@@ -60,68 +60,11 @@ export async function GET(request: NextRequest) {
 }
 ```
 
-See [TiDB serverless driver](https://docs.pingcap.com/tidbcloud/serverless-driver#edge-examples) documentation to learn more examples.
+See [TiDB Serverless driver](https://docs.pingcap.com/tidbcloud/serverless-driver#edge-examples) documentation to learn more.
 
 ## Configuration
 
-The following configurations are supported in connection level:
-
-| name       | type      | default      | comment                                                          |
-|------------|-----------|--------------|------------------------------------------------------------------|
-| username   | string    | /            | Username of TiDB Severless                                       |
-| password   | string    | /            | Password of TiDB Severless                                       |
-| host       | string    | /            | Host of TiDB Severless                                           |
-| database   | string    | test         | Database of TiDB Severless                                       |
-| url        | string    | /            | A single url format as `mysql://username:password@host/database` |
-| fetch      | function  | global fetch | Custom fetch function                                            |
-| arrayMode  | bool      | false        | whether to return results as arrays instead of objects           |
-| fullResult | bool      | false        | whether to return full result object instead of just rows        |
-
-### Database URL
-
-A single database URL value can be used to configure the `host`, `username`, `password` and `database` values. The following codes are equivalent:
-
-```ts
-const config = {
-  host: '<host>',
-  username: '<user>',
-  password: '<password>',
-  database: '<database>'
-}
-
-const conn = connect(config)
-```
-
-```ts
-const conn = connect({url: process.env['DATABASE_URL'] || 'mysql://username:password@host/database'})
-```
-
-## Options
-
-> Note: SQL level options priority is higher than connection level configurations.
-
-The following options are supported in SQL level:
-
-| option     | type | default | comment                                                   |
-|------------|------|---------|-----------------------------------------------------------|
-| arrayMode  | bool | false   | whether to return results as arrays instead of objects    |
-| fullResult | bool | false   | whether to return full result object instead of just rows |
-
-
-```ts
-import { connect } from '@tidbcloud/serverless'
-
-const config = {
-  url: process.env['DATABASE_URL'] || 'mysql://username:password@host/database'
-}
-
-const conn = connect(config)
-const results = await conn.execute('select 1 from test',null,{arrayMode:true,fullResult:true})
-```
-
-## Documentation
-
-See [TiDB serverless driver](https://docs.pingcap.com/tidbcloud/serverless-driver) documentation to learn more.
+See [Configure TiDB Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver-config).
 
 ## License
 
