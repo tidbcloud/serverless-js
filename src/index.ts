@@ -85,8 +85,12 @@ export class Connection {
         this.config.database = url.pathname.slice(1)
       }
     }
-    // decode password escape
+    // unescape password
     this.config.password = decodeURIComponent(this.config.password)
+    // unescape database
+    if (this.config.database) {
+      this.config.database = decodeURIComponent(this.config.database)
+    }
   }
 
   async begin(): Promise<Tx> {
