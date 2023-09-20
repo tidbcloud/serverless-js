@@ -77,7 +77,6 @@ export class Connection {
       }
       if (!this.config.password) {
         this.config.password = decodeURIComponent(url.password)
-
       }
       if (!this.config.host) {
         this.config.host = url.hostname
