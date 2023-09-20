@@ -86,10 +86,16 @@ export class Connection {
       }
     }
     // unescape password
-    this.config.password = decodeURIComponent(this.config.password)
+    if (this.config.password) {
+      this.config.password = decodeURIComponent(this.config.password)
+    }
     // unescape database
     if (this.config.database) {
       this.config.database = decodeURIComponent(this.config.database)
+    }
+    // unescape username
+    if (this.config.username) {
+      this.config.username = decodeURIComponent(this.config.username)
     }
   }
 
