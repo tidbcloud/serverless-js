@@ -73,29 +73,18 @@ export class Connection {
     if (config.url) {
       const url = new URL(config.url)
       if (!this.config.username) {
-        this.config.username = url.username
+        this.config.username = decodeURIComponent(url.username)
       }
       if (!this.config.password) {
-        this.config.password = url.password
+        this.config.password = decodeURIComponent(url.password)
+
       }
       if (!this.config.host) {
         this.config.host = url.hostname
       }
       if (!this.config.database) {
-        this.config.database = url.pathname.slice(1)
+        this.config.database = decodeURIComponent(url.pathname.slice(1))
       }
-    }
-    // unescape password
-    if (this.config.password) {
-      this.config.password = decodeURIComponent(this.config.password)
-    }
-    // unescape database
-    if (this.config.database) {
-      this.config.database = decodeURIComponent(this.config.database)
-    }
-    // unescape username
-    if (this.config.username) {
-      this.config.username = decodeURIComponent(this.config.username)
     }
   }
 
