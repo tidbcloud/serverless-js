@@ -3,6 +3,7 @@
   "version": "0.0.5",
   "description": "TiDB Serverless driver",
   "main": "dist/index.js",
+  "module": "./dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
@@ -10,11 +11,16 @@
   "engines": {
     "node": ">=16"
   },
+  "exports": {
+    "import": "./dist/index.js",
+    "require": "./dist/cjs/index.js"
+  },
   "type": "module",
   "scripts": {
     "clean": "rm -rf dist/",
     "prebuild": "npm run clean",
-    "build": "tsc",
+    "build": "tsc && tsc --module commonjs --outDir dist/cjs",
+    "postbuild": "echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
     "lint": "eslint src/",
     "pretest": "npm run build",
     "test": "jest __tests__ --passWithNoTests",
