@@ -1,7 +1,7 @@
 import { Config } from './config.js'
 import { DatabaseError } from './error.js'
 import { Version } from './version.js'
-export async function postQuery<T>(config: Config, body, session = ''): Promise<T> {
+export async function postQuery<T>(config: Config, body, session = '', isolationLevel = null): Promise<T> {
   let fetchCacheOption: Record<string, any> = { cache: 'no-store' }
   // Cloudflare Workers does not support cache now https://github.com/cloudflare/workerd/issues/69
   try {
@@ -14,16 +14,20 @@ export async function postQuery<T>(config: Config, body, session = ''): Promise<
   const auth = btoa(`${config.username}:${config.password}`)
   const { fetch } = config
   const database = config.database ?? ''
+  const headers = {
+    'Content-Type': 'application/json',
+    'User-Agent': `serverless-js/${Version}`,
+    Authorization: `Basic ${auth}`,
+    'TiDB-Database': database,
+    'TiDB-Session': session
+  }
+  if (isolationLevel) {
+    headers['TiDB-Isolation-Level'] = isolationLevel
+  }
   const response = await fetch(url.toString(), {
     method: 'POST',
     body: body,
-    headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': `serverless-js/${Version}`,
-      Authorization: `Basic ${auth}`,
-      'TiDB-Database': database,
-      'TiDB-Session': session
-    },
+    headers,
     ...fetchCacheOption
   })
 

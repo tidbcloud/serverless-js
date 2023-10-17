@@ -30,4 +30,15 @@ export interface ExecuteOptions {
   fullResult?: boolean
 }
 
+export enum IsolationLevel {
+  ReadUncommitted = 'READ UNCOMMITTED',
+  ReadCommitted = 'READ COMMITTED',
+  RepeatableRead = 'REPEATABLE READ',
+  Serializable = 'SERIALIZABLE'
+}
+
+export interface TxOptions {
+  Isolation?: IsolationLevel
+}
+
 export type ExecuteArgs = object | any[] | null
