@@ -1,7 +1,7 @@
 import { format } from './format.js'
 import { cast } from './decode.js'
 import { DatabaseError } from './error.js'
-import { Config, ExecuteOptions, ExecuteArgs } from './config.js'
+import { Config, ExecuteOptions, ExecuteArgs, TxOptions } from './config.js'
 import { postQuery } from './serverless.js'
 
 export { Config, ExecuteOptions, ExecuteArgs, DatabaseError }
@@ -45,8 +45,13 @@ export class Tx {
     this.conn = conn
   }
 
-  async execute(query: string, args: ExecuteArgs = null, options: ExecuteOptions = defaultExecuteOptions): Promise<FullResult | Row[]> {
-    return this.conn.execute(query, args, options)
+  async execute(
+    query: string,
+    args: ExecuteArgs = null,
+    options: ExecuteOptions = defaultExecuteOptions,
+    txOptions: TxOptions = {}
+  ): Promise<FullResult | Row[]> {
+    return this.conn.execute(query, args, options, txOptions)
   }
 
   async commit(): Promise<FullResult | Row[]> {
@@ -87,17 +92,22 @@ export class Connection {
     }
   }
 
-  async begin(): Promise<Tx> {
+  async begin(txOptions: TxOptions = {}): Promise<Tx> {
     const conn = new Connection(this.config)
     const tx = new Tx(conn)
-    await tx.execute('BEGIN')
+    await tx.execute('BEGIN', undefined, undefined, txOptions)
     return tx
   }
 
-  async execute(query: string, args: ExecuteArgs = null, options: ExecuteOptions = defaultExecuteOptions): Promise<FullResult | Row[]> {
+  async execute(
+    query: string,
+    args: ExecuteArgs = null,
+    options: ExecuteOptions = defaultExecuteOptions,
+    txOptions: TxOptions = {}
+  ): Promise<FullResult | Row[]> {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
-    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '')
+    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '', sql == 'BEGIN' ? txOptions.isolation : null)
 
     this.session = resp?.session ?? null
     if (this.session === null || this.session === '') {

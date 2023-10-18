@@ -30,4 +30,8 @@ export interface ExecuteOptions {
   fullResult?: boolean
 }
 
+export interface TxOptions {
+  isolation?: 'READ COMMITTED' | 'REPEATABLE READ'
+}
+
 export type ExecuteArgs = object | any[] | null
