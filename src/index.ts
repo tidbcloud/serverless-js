@@ -107,7 +107,7 @@ export class Connection {
   ): Promise<FullResult | Row[]> {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
-    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '', sql == 'BEGIN' ? txOptions.Isolation : null)
+    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '', sql == 'BEGIN' ? txOptions.isolation : null)
 
     this.session = resp?.session ?? null
     if (this.session === null || this.session === '') {

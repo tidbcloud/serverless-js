@@ -126,5 +126,17 @@ describe('basic', () => {
     const row = r[0] as Record<string, any>
     expect(row.first_name).toEqual('base')
   })
+
+  test('transaction isolation level', async () => {
+    const con = connect({url: databaseURL, database: database, fetch})
+    await con.execute(`delete from ${table} where emp_no = 1`)
+
+    const tx = await con.begin({isolation:"READ COMMITTED"})
+    const result1 = await tx.execute(`select * from ${table}`) as Row[]
+    await con.execute(`insert into ${table} values (1, '\\"John\\"', 'Doe')`)
+    const result2 =  await tx.execute(`select * from ${table}`) as Row[]
+    await tx.commit()
+    expect(result1.length+1).toEqual(result2.length)
+  })
 })
 

@@ -31,7 +31,7 @@ export interface ExecuteOptions {
 }
 
 export interface TxOptions {
-  Isolation?: 'READ COMMITTED' | 'REPEATABLE READ'
+  isolation?: 'READ COMMITTED' | 'REPEATABLE READ'
 }
 
 export type ExecuteArgs = object | any[] | null
