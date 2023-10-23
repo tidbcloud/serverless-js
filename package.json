@@ -1,7 +1,7 @@
 {
   "name": "@tidbcloud/serverless",
   "version": "0.0.7",
-  "description": "TiDB Serverless driver",
+  "description": "TiDB Cloud Serverless Driver",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -89,5 +89,19 @@
       "browser": true,
       "node": true
     }
-  }
+  },
+  "keywords": [
+    "TiDB",
+    "TiDB Cloud",
+    "serverless",
+    "MySQL",
+    "edge",
+    "Vercel",
+    "Cloudflare",
+    "Netlify",
+    "Bun",
+    "Deno",
+    "database",
+    "SQL"
+  ]
 }
