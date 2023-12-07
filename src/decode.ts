@@ -1,9 +1,9 @@
 import { Field } from './index.js'
 
-const decoder = new TextDecoder('utf-8')
+const decoder = new TextDecoder('utf-16')
 
 export function decode(text: string | null): string {
-  return text ? decoder.decode(Uint8Array.from(bytes(text))) : ''
+  return text ? decoder.decode(Uint16Array.from(bytes(text))) : ''
 }
 
 function bytes(text: string): number[] {
