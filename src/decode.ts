@@ -1,17 +1,7 @@
 import { Field } from './index.js'
 
-const decoder = new TextDecoder('utf-8')
-
-export function decode(text: string | null): string {
-  return text ? decoder.decode(Uint8Array.from(bytes(text))) : ''
-}
-
-function bytes(text: string): number[] {
-  return text.split('').map((c) => c.charCodeAt(0))
-}
-
 export function cast(field: Field, value: string | null): any {
-  if (isNull(value)) {
+  if (value === null) {
     return null
   }
 
@@ -54,12 +44,6 @@ export function cast(field: Field, value: string | null): any {
     case 'JSON':
       return JSON.parse(value)
     default:
-      return decode(value)
-  }
-}
-
-function isNull(value): boolean {
-  if (value === null) {
-    return true
+      return value
   }
 }
