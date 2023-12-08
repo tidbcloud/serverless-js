@@ -1,30 +1,65 @@
-import { decode,cast } from '../src/decode'
+import { Field } from './index.js'
 
-describe('decode', () => {
-  describe('decode', () => {
-    test('decodes ascii bytes', () => {
-      expect(decode('a')).toEqual('a')
-    })
+const decoder = new TextDecoder('utf-8')
 
-    test('decodes empty string', () => {
-      expect(decode('')).toEqual('')
-    })
+export function decode(text: string | null): string {
+  return text ? decoder.decode(Uint8Array.from(bytes(text))) : ''
+}
 
-    test('decodes null value', () => {
-      expect(decode(null)).toEqual('')
-    })
+function bytes(text: string): number[] {
+  return text.split('').map((c) => c.charCodeAt(0))
+}
 
-    test('decodes undefined value', () => {
-      expect(decode(undefined)).toEqual('')
-    })
+export function cast(field: Field, value: string | null): any {
+  if (isNull(value)) {
+    return null
+  }
 
-    test('decodes multi-byte characters', () => {
-      expect(decode('\xF0\x9F\xA4\x94')).toEqual('🤔')
-    })
-  })
+  switch (field.type) {
+    // bool will be converted to TINYINT
+    case 'TINYINT':
+    case 'UNSIGNED TINYINT':
+    case 'SMALLINT':
+    case 'UNSIGNED SMALLINT':
+    case 'MEDIUMINT':
+    case 'INT':
+    case 'UNSIGNED INT':
+    case 'YEAR':
+      return parseInt(value, 10)
+    case 'FLOAT':
+    case 'DOUBLE':
+      return parseFloat(value)
+    // set and enum will be converted to char.
+    case 'BIGINT':
+    case 'UNSIGNED BIGINT':
+    case 'DECIMAL':
+    case 'CHAR':
+    case 'VARCHAR':
+    case 'BINARY':
+    case 'VARBINARY':
+    case 'TINYTEXT':
+    case 'TEXT':
+    case 'MEDIUMTEXT':
+    case 'LONGTEXT':
+    case 'TINYBLOB':
+    case 'BLOB':
+    case 'MEDIUMBLOB':
+    case 'LONGBLOB':
+    case 'DATE':
+    case 'TIME':
+    case 'DATETIME':
+    case 'TIMESTAMP':
+    case 'BIT':
+      return value
+    case 'JSON':
+      return JSON.parse(decode(value))
+    default:
+      return decode(value)
+  }
+}
 
-  describe('cast', () => {
-
-  })
-
-})
+function isNull(value): boolean {
+  if (value === null) {
+    return true
+  }
+}
