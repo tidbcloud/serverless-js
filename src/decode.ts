@@ -1,13 +1,7 @@
 import { Field } from './index.js'
 
-const decoder = new TextDecoder('utf-16')
-
 export function decode(text: string | null): string {
-  return text ? decoder.decode(Uint16Array.from(bytes(text))) : ''
-}
-
-function bytes(text: string): number[] {
-  return text.split('').map((c) => c.charCodeAt(0))
+  return text ?? ''
 }
 
 export function cast(field: Field, value: string | null): any {
