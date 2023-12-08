@@ -18,7 +18,7 @@ describe('decode', () => {
       expect(decode(undefined)).toEqual('')
     })
 
-    test('decodes multi-byte characters', () => {
+    test('decodes chinese', () => {
       expect(decode('你好')).toEqual('你好')
     })
 
