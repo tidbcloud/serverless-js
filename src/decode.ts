@@ -52,7 +52,7 @@ export function cast(field: Field, value: string | null): any {
     case 'BIT':
       return value
     case 'JSON':
-      return JSON.parse(decode(value))
+      return JSON.parse(value)
     default:
       return decode(value)
   }
