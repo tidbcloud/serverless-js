@@ -92,6 +92,10 @@ export class Connection {
     }
   }
 
+  getConfig(): Config {
+    return this.config
+  }
+
   async begin(txOptions: TxOptions = {}): Promise<Tx> {
     const conn = new Connection(this.config)
     const tx = new Tx(conn)
