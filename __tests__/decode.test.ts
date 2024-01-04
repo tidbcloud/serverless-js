@@ -18,7 +18,7 @@ describe('decode', () => {
 
       expect(cast(makeField(ColumnType.BIGINT), '21412421321421521321', config)).toEqual(21412421321421521321n)
       expect(cast(makeField(ColumnType.FLOAT), '1.2', config)).toEqual('1.2')
-      expect(cast(makeField(ColumnType.INT), '1', {})).toEqual(1)
+      expect(cast(makeField(ColumnType.INT), '1', config)).toEqual(1)
     })
   })
 })
