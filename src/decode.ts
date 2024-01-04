@@ -1,4 +1,4 @@
-import type { DecodeConfig } from './config';
+import type { DecodeConfig } from './config'
 import { Field } from './index.js'
 
 export function cast(field: Field, value: string | null, decode: DecodeConfig): any {
