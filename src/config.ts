@@ -72,10 +72,8 @@ export const enum ColumnType {
   JSON = 'JSON'
 }
 
-export type DecodeConfig = Partial<
-  {
-    [P in ColumnType]: (rawValue: string) => any
-  } & {
-    [key: string]: (rawValue: string) => any
-  }
->
+export type DecodeConfig = {
+  [P in ColumnType]?: (rawValue: string) => any
+} & {
+  [key: string]: (rawValue: string) => any
+}
