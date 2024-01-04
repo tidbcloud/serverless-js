@@ -10,7 +10,7 @@ describe('decode', () => {
       expect(cast(makeField(ColumnType.INT), '1', {})).toEqual(1)
     })
 
-    test('override default decode method if config not provided', () => {
+    test('override default decode method if config provided', () => {
       const config: DecodeConfig = {
         [ColumnType.BIGINT]: BigInt,
         [ColumnType.FLOAT]: String
