@@ -1,8 +1,14 @@
+import type { DecodeConfig } from './config';
 import { Field } from './index.js'
 
-export function cast(field: Field, value: string | null): any {
+export function cast(field: Field, value: string | null, decode: DecodeConfig): any {
   if (value === null) {
     return null
+  }
+
+  // use user provided decoder if exists
+  if (decode[field.type]) {
+    return decode[field.type](value)
   }
 
   switch (field.type) {
