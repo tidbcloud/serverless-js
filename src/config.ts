@@ -23,13 +23,13 @@ export interface Config {
   fetch?: (input: string, init?: Req) => Promise<Res>
   arrayMode?: boolean
   fullResult?: boolean
-  decode?: DecodeConfig
+  decoders?: Decoders
 }
 
 export interface ExecuteOptions {
   arrayMode?: boolean
   fullResult?: boolean
-  decode?: DecodeConfig
+  decoders?: Decoders
 }
 
 export interface TxOptions {
@@ -72,8 +72,6 @@ export const enum ColumnType {
   JSON = 'JSON'
 }
 
-export type DecodeConfig = {
+export type Decoders = {
   [P in ColumnType]?: (rawValue: string) => any
-} & {
-  [key: string]: (rawValue: string) => any
 }

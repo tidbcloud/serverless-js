@@ -1,5 +1,5 @@
 import type { Field } from '../src'
-import { ColumnType, type DecodeConfig } from '../src/config'
+import { ColumnType, Decoders } from '../src/config'
 import { cast } from '../src/decode'
 
 describe('decode', () => {
@@ -11,7 +11,7 @@ describe('decode', () => {
     })
 
     test('override default decode method if config provided', () => {
-      const config: DecodeConfig = {
+      const config: Decoders = {
         [ColumnType.BIGINT]: BigInt,
         [ColumnType.FLOAT]: String
       }
