@@ -148,16 +148,17 @@ beforeAll(async () => {
 describe('types', () => {
 
   test('test null', async () => {
+    console.log(databaseURL)
     const con = connect({url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table}`)
     await con.execute('insert into multi_data_type values ()')
     const r = await con.execute('select * from multi_data_type',null, {fullResult: true}) as FullResult
-    console.log(r)
     expect(r.rows.length).toEqual(1)
     expect(JSON.stringify(r.rows[0])).toEqual(JSON.stringify(nullResult))
   })
 
   test('test all types', async () => {
+    console.log(databaseURL)
     const con = connect({url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table}`)
     const x = await con.execute(insertSQL,null, {fullResult: true})
