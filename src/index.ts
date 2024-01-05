@@ -33,10 +33,7 @@ interface QueryExecuteResponse {
   lastInsertID: number | null
 }
 
-const defaultExecuteOptions: ExecuteOptions = {
-  arrayMode: false,
-  fullResult: false
-}
+const defaultExecuteOptions: ExecuteOptions = {}
 
 export class Tx {
   private conn: Connection
@@ -119,7 +116,7 @@ export class Connection {
     }
 
     const arrayMode = options.arrayMode ?? this.config.arrayMode ?? false
-    const fullResult = options.fullResult ?? this.config.arrayMode ?? false
+    const fullResult = options.fullResult ?? this.config.fullResult ?? false
     const decoders = { ...this.config.decoders, ...options.decoders }
 
     const fields = resp?.types ?? []
