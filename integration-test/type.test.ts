@@ -3,7 +3,7 @@ import { fetch } from 'undici'
 import * as dotenv from 'dotenv';
 
 dotenv.config();
-const databaseURL =  process.env.DATABASE_URL
+const databaseURL = process.env.DATABASE_URL
 const database = 'test_serverless_type'
 const table = 'multi_data_type'
 const multiDataTable = `
@@ -148,7 +148,6 @@ beforeAll(async () => {
 describe('types', () => {
 
   test('test null', async () => {
-    console.log(databaseURL)
     const con = connect({url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table}`)
     await con.execute('insert into multi_data_type values ()')
@@ -158,10 +157,11 @@ describe('types', () => {
   })
 
   test('test all types', async () => {
-    console.log(databaseURL)
     const con = connect({url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table}`)
+    await con.execute(insertSQL)
     const rows = await con.execute('select * from multi_data_type') as Row[]
+    console.log(rows)
     expect(rows.length).toEqual(1)
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })

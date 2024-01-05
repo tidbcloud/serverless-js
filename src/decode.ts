@@ -18,6 +18,7 @@ export function cast(field: Field, value: string | null, decoder: Decoders): any
     case 'SMALLINT':
     case 'UNSIGNED SMALLINT':
     case 'MEDIUMINT':
+    case 'UNSIGNED MEDIUMINT':
     case 'INT':
     case 'UNSIGNED INT':
     case 'YEAR':
