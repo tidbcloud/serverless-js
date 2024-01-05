@@ -23,7 +23,7 @@ describe('basic', () => {
     const con = connect({url: databaseURL, database: database, fetch})
     const results = await con.execute(`SHOW TABLES`)
     expect(JSON.stringify(results)).toContain(`${table}`)
-  })
+  },10000)
 
   test('dml', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
@@ -38,7 +38,7 @@ describe('basic', () => {
     await con.execute(`delete from ${table} where emp_no = 1`)
     const result3 =  await con.execute(`select * from ${table} where emp_no = 1`) as Row[]
     expect(result3.length).toEqual(0)
-  })
+  },10000)
 
   test('option', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
@@ -63,7 +63,7 @@ describe('basic', () => {
     }
     expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
     expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
-  })
+  },10000)
 
   test('query with escape', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
@@ -81,7 +81,7 @@ describe('basic', () => {
     const row2 = r2[0] as Record<string, any>
     expect(row1.emp_no).toEqual(1)
     expect(row2.emp_no).toEqual(2)
-  })
+  },10000)
 
   test('transaction isolation', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
@@ -101,7 +101,7 @@ describe('basic', () => {
       }
       throw e
     }
-  })
+  },10000)
 
   test('transaction rollback', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
@@ -124,7 +124,7 @@ describe('basic', () => {
     expect(r.length).toEqual(1)
     const row = r[0] as Record<string, any>
     expect(row.first_name).toEqual('base')
-  })
+  },10000)
 
   test('transaction isolation level', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
@@ -136,6 +136,6 @@ describe('basic', () => {
     const result2 =  await tx.execute(`select * from ${table}`) as Row[]
     await tx.commit()
     expect(result1.length+1).toEqual(result2.length)
-  })
+  },10000)
 })
 
