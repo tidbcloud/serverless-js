@@ -161,12 +161,8 @@ describe('types', () => {
     console.log(databaseURL)
     const con = connect({url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table}`)
-    const x = await con.execute(insertSQL,null, {fullResult: true})
-    console.log(x)
-    // const rows = await con.execute('select * from multi_data_type') as Row[]
-    const rows = await con.execute('select * from multi_data_type',null, {fullResult: true})
-    console.log(rows)
-    // expect(rows.length).toEqual(1)
-    // expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
+    const rows = await con.execute('select * from multi_data_type') as Row[]
+    expect(rows.length).toEqual(1)
+    expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })
 })
