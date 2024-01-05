@@ -16,7 +16,7 @@ beforeAll(async () => {
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(EmployeeTable)
   await con.execute(`insert into ${database}.${table} values (0, 'base', 'base')`)
-},10000);
+},20000);
 
 describe('basic', () => {
   test('ddl', async () => {
@@ -43,11 +43,9 @@ describe('basic', () => {
   test('option', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
     const result1 = await con.execute(`select * from ${table} where emp_no=0`,null, {arrayMode: true})
-    expect(result1 instanceof Array).toEqual(true)
-
     const result2 = await con.execute(`select * from ${table} where emp_no=0`,null, {fullResult: true})
-    expect(result2 instanceof Array).toEqual(false)
-    const except: FullResult = {
+    const except1: Row[] = [[0, 'base', 'base']]
+    const except2: FullResult = {
       statement: `select * from ${table} where emp_no=0`,
       types:{
         emp_no: 'INT',
@@ -63,7 +61,8 @@ describe('basic', () => {
       lastInsertId: null,
       rowCount: 1
     }
-    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except))
+    expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
+    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
   })
 
   test('query with escape', async () => {

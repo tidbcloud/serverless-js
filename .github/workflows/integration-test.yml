@@ -8,17 +8,16 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - uses: actions/cache@v3
+      - uses: actions/setup-node@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-      - run: |
+          node-version: 18
+          cache: 'npm'
+      - name: Run integrationTest
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
           npm ci
-          export DATABASE_URL=${{ secrets.DATABASE_URL }}
           npm run integrationTest

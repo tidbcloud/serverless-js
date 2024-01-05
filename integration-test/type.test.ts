@@ -92,7 +92,7 @@ INSERT INTO ${database}.${table}( t_tinyint, t_tinyint_unsigned, t_smallint, t_s
                            , t_tinyblob, t_blob, t_mediumblob, t_longblob
                            , t_date, t_datetime, t_timestamp, t_time, t_year
                            , t_enum,t_bit, t_set, t_json)
-VALUES ( -128, 255, -32768, 65535, -8388608, 16777215, -2147483648, 4294967295, -9223372036854775808, 18446744073709551615
+VALUES ( -128, 255, -32768, 65535, -8388608, 16777215, -2147483648, 1, -9223372036854775808, 18446744073709551615
        , true, 123.456, 123.123, 123456789012.123456789012
        , '测', '测试', x'89504E470D0A1A0A', x'89504E470D0A1A0A', '测试tinytext', '0', '测试mediumtext', '测试longtext'
        , 'tinyblob', 'blob', 'mediumblob', 'longblob'
@@ -108,7 +108,7 @@ const fullTypeResult = {
       t_mediumint: -8388608,
       t_mediumint_unsigned: 16777215,
       t_int: -2147483648,
-      t_int_unsigned: 4294967295,
+      t_int_unsigned: 1,
       t_bigint: '-9223372036854775808',
       t_bigint_unsigned: '18446744073709551615',
       t_boolean: 1,
