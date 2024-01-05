@@ -24,4 +24,4 @@ jobs:
           npm ci
           npm install
           export DATABASE_URL=${{ secrets.DATABASE_URL }}
-      - run: npm run integrationTest
+          npm run integrationTest
