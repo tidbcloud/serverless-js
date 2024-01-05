@@ -65,6 +65,41 @@ describe('basic', () => {
     expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
   })
 
+  test('arrayMode with config and option', async () => {
+    const con = connect({url: databaseURL, database: database, fetch, arrayMode: true})
+    const result1 = await con.execute(`select * from ${table} where emp_no=0`,null, {arrayMode: false})
+    const result2 = await con.execute(`select * from ${table} where emp_no=0`)
+    const except1: Row[] = [ { emp_no: 0, first_name: 'base', last_name: 'base' } ]
+    const except2: Row[] = [[0, 'base', 'base']]
+    expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
+    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
+  })
+
+  test('fullResult with config and option', async () => {
+    const con = connect({url: databaseURL, database: database, fetch, fullResult: true})
+    const result1 = await con.execute(`select * from ${table} where emp_no=0`,null, {fullResult: false})
+    const result2 = await con.execute(`select * from ${table} where emp_no=0`)
+    const except1: Row[] = [ { emp_no: 0, first_name: 'base', last_name: 'base' } ]
+    const except2: FullResult = {
+      statement: `select * from ${table} where emp_no=0`,
+      types:{
+        emp_no: 'INT',
+        first_name: 'VARCHAR',
+        last_name: 'VARCHAR'
+      },
+      rows: [{
+        emp_no: 0,
+        first_name: 'base',
+        last_name: 'base'
+      }],
+      rowsAffected: 0,
+      lastInsertId: null,
+      rowCount: 1
+    }
+    expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
+    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
+  })
+
   test('query with escape', async () => {
     const con = connect({url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table} where emp_no = 1 or emp_no = 2`)
