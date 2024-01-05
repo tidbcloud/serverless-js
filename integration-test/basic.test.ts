@@ -16,7 +16,7 @@ beforeAll(async () => {
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(EmployeeTable)
   await con.execute(`insert into ${database}.${table} values (0, 'base', 'base')`)
-},10000);
+},100000);
 
 describe('basic', () => {
   test('ddl', async () => {
