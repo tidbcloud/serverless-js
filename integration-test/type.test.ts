@@ -1,9 +1,9 @@
 import { connect,Row,FullResult } from '../dist/index'
-import { fetch } from 'undici'
 
 const databaseURL = process.env.DATABASE_URL
 const database = 'test_serverless_type'
 const table = 'multi_data_type'
+const fetch = global.fetch
 const multiDataTable = `
     CREATE TABLE ${database}.${table}(
     t_tinyint            TINYINT,

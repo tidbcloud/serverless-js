@@ -1,9 +1,9 @@
 import { connect,Row,FullResult } from '../dist/index'
-import { fetch } from 'undici'
 
 let databaseURL
 const database = 'test_serverless_basic'
 const table = 'employee'
+const fetch = global.fetch
 
 const EmployeeTable = `CREATE TABLE ${database}.${table} (emp_no INT,first_name VARCHAR(255),last_name VARCHAR(255))`
 
