@@ -161,7 +161,6 @@ describe('types', () => {
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
     const rows = await con.execute('select * from multi_data_type') as Row[]
-    console.log(rows)
     expect(rows.length).toEqual(1)
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })
