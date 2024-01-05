@@ -23,11 +23,13 @@ export interface Config {
   fetch?: (input: string, init?: Req) => Promise<Res>
   arrayMode?: boolean
   fullResult?: boolean
+  decoders?: Decoders
 }
 
 export interface ExecuteOptions {
   arrayMode?: boolean
   fullResult?: boolean
+  decoders?: Decoders
 }
 
 export interface TxOptions {
@@ -35,3 +37,41 @@ export interface TxOptions {
 }
 
 export type ExecuteArgs = object | any[] | null
+
+export const enum ColumnType {
+  TINYINT = 'TINYINT',
+  UNSIGNED_TINYINT = 'UNSIGNED TINYINT',
+  SMALLINT = 'SMALLINT',
+  UNSIGNED_SMALLINT = 'UNSIGNED SMALLINT',
+  MEDIUMINT = 'MEDIUMINT',
+  INT = 'INT',
+  UNSIGNED_INT = 'UNSIGNED INT',
+  YEAR = 'YEAR',
+  FLOAT = 'FLOAT',
+  DOUBLE = 'DOUBLE',
+  BIGINT = 'BIGINT',
+  UNSIGNED_BIGINT = 'UNSIGNED BIGINT',
+  DECIMAL = 'DECIMAL',
+  CHAR = 'CHAR',
+  VARCHAR = 'VARCHAR',
+  BINARY = 'BINARY',
+  VARBINARY = 'VARBINARY',
+  TINYTEXT = 'TINYTEXT',
+  TEXT = 'TEXT',
+  MEDIUMTEXT = 'MEDIUMTEXT',
+  LONGTEXT = 'LONGTEXT',
+  TINYBLOB = 'TINYBLOB',
+  BLOB = 'BLOB',
+  MEDIUMBLOB = 'MEDIUMBLOB',
+  LONGBLOB = 'LONGBLOB',
+  DATE = 'DATE',
+  TIME = 'TIME',
+  DATETIME = 'DATETIME',
+  TIMESTAMP = 'TIMESTAMP',
+  BIT = 'BIT',
+  JSON = 'JSON'
+}
+
+export type Decoders = {
+  [P in ColumnType]?: (rawValue: string) => any
+}

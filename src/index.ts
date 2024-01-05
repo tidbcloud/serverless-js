@@ -1,7 +1,7 @@
 import { format } from './format.js'
 import { cast } from './decode.js'
 import { DatabaseError } from './error.js'
-import { Config, ExecuteOptions, ExecuteArgs, TxOptions } from './config.js'
+import { Config, ExecuteOptions, ExecuteArgs, TxOptions, Decoders } from './config.js'
 import { postQuery } from './serverless.js'
 
 export { Config, ExecuteOptions, ExecuteArgs, DatabaseError }
@@ -120,9 +120,10 @@ export class Connection {
 
     const arrayMode = options.arrayMode ?? this.config.arrayMode ?? false
     const fullResult = options.fullResult ?? this.config.arrayMode ?? false
+    const decoders = { ...this.config.decoders, ...options.decoders }
 
     const fields = resp?.types ?? []
-    const rows = resp ? parse(fields, resp?.rows ?? [], cast, arrayMode) : []
+    const rows = resp ? parse(fields, resp?.rows ?? [], cast, arrayMode, decoders) : []
 
     if (fullResult) {
       const rowsAffected = resp?.rowsAffected ?? 0
@@ -147,19 +148,19 @@ export function connect(config: Config): Connection {
 }
 
 type Cast = typeof cast
-function parseArrayRow(fields: Field[], rawRow: string[], cast: Cast): Row {
+function parseArrayRow(fields: Field[], rawRow: string[], cast: Cast, decoders: Decoders): Row {
   return fields.map((field, ix) => {
-    return cast(field, rawRow[ix])
+    return cast(field, rawRow[ix], decoders)
   })
 }
 
-function parseObjectRow(fields: Field[], rawRow: string[], cast: Cast): Row {
+function parseObjectRow(fields: Field[], rawRow: string[], cast: Cast, decoders: Decoders): Row {
   return fields.reduce((acc, field, ix) => {
-    acc[field.name] = cast(field, rawRow[ix])
+    acc[field.name] = cast(field, rawRow[ix], decoders)
     return acc
   }, {} as Row)
 }
 
-function parse(fields: Field[], rows: string[][], cast: Cast, arrayMode: boolean): Row[] {
-  return rows.map((row) => (arrayMode === true ? parseArrayRow(fields, row, cast) : parseObjectRow(fields, row, cast)))
+function parse(fields: Field[], rows: string[][], cast: Cast, arrayMode: boolean, decode: Decoders): Row[] {
+  return rows.map((row) => (arrayMode === true ? parseArrayRow(fields, row, cast, decode) : parseObjectRow(fields, row, cast, decode)))
 }
