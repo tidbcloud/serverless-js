@@ -1,6 +1,5 @@
 import { connect,Row,FullResult } from '../dist/index'
 import { fetch } from 'undici'
-import * as dotenv from 'dotenv';
 
 let databaseURL
 const database = 'test_serverless_basic'
@@ -9,7 +8,6 @@ const table = 'employee'
 const EmployeeTable = `CREATE TABLE ${database}.${table} (emp_no INT,first_name VARCHAR(255),last_name VARCHAR(255))`
 
 beforeAll(async () => {
-  dotenv.config();
   databaseURL = process.env.DATABASE_URL
   const con = connect({url: databaseURL, fetch})
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)

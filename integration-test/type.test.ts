@@ -1,8 +1,6 @@
 import { connect,Row,FullResult } from '../dist/index'
 import { fetch } from 'undici'
-import * as dotenv from 'dotenv';
 
-dotenv.config();
 const databaseURL = process.env.DATABASE_URL
 const database = 'test_serverless_type'
 const table = 'multi_data_type'
