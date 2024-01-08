@@ -38,23 +38,20 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     ...fetchCacheOption
   })
 
+  if (debug) {
+    const traceId = response?.headers?.get('X-Debug-Trace-Id')
+    console.log(`[serverless-js debug] response id: ${traceId}`)
+  }
+
   if (response.ok) {
     const resp = await response.json()
     const session = response.headers.get('TiDB-Session')
-    if (debug) {
-      const traceId = response.headers.get('X-Debug-Trace-Id')
-      console.log(`[serverless-js debug] response id: ${traceId}`)
-    }
     resp.session = session ?? ''
     return resp
   } else {
     let error
     try {
       const e = await response.json()
-      if (debug) {
-        const traceId = response.headers.get('X-Debug-Trace-Id')
-        console.log(`[serverless-js debug] response id: ${traceId}`)
-      }
       error = new DatabaseError(e.message, response.status, e)
     } catch {
       error = new DatabaseError(response.statusText, response.status, null)
