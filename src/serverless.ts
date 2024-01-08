@@ -61,16 +61,16 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
 
 // simulate xid
 function generateUniqueId() {
-  const datetime = new Date().toISOString().replace(/[^\d]/g, '').slice(0, 14);
+  const datetime = new Date().toISOString().replace(/[^\d]/g, '').slice(0, 14)
   return `${datetime}${randomString(20)}`
 }
 
 function randomString(n) {
-  let result = '';
-  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  const l = characters.length;
+  let result = ''
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  const l = characters.length
   for (let i = 0; i < n; i++) {
     result += characters[Math.floor(Math.random() * l)]
   }
-  return result;
+  return result
 }
