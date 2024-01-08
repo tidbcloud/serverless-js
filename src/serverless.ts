@@ -59,6 +59,7 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
   }
 }
 
+// simulate xid
 function generateUniqueId() {
   const datetime = new Date().toISOString().replace(/[^\d]/g, '').slice(0, 14);
   return `${datetime}${randomString(20)}`
