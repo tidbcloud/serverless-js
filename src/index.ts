@@ -112,7 +112,13 @@ export class Connection {
     if (debug) {
       console.log(`[serverless-js debug] sql: ${sql}`)
     }
-    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '', sql == 'BEGIN' ? txOptions.isolation : null,debug)
+    const resp = await postQuery<QueryExecuteResponse>(
+      this.config,
+      body,
+      this.session ?? '',
+      sql == 'BEGIN' ? txOptions.isolation : null,
+      debug
+    )
 
     this.session = resp?.session ?? null
     if (this.session === null || this.session === '') {

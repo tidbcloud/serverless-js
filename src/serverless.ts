@@ -11,7 +11,7 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
   }
 
   // generate request Id
-  const requestId = generateUniqueId();
+  const requestId = generateUniqueId()
   if (debug) {
     console.log(`[serverless-js debug] request id: ${requestId}`)
   }
@@ -60,5 +60,5 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
 }
 
 function generateUniqueId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`;
+  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`
 }
