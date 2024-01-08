@@ -11,7 +11,7 @@ const EmployeeTable = `CREATE TABLE ${database}.${table} (emp_no INT,first_name 
 beforeAll(async () => {
   dotenv.config();
   databaseURL = process.env.DATABASE_URL
-  const con = connect({url: databaseURL, fetch})
+  const con = connect({url: databaseURL, fetch,debug: true})
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(EmployeeTable)
@@ -20,13 +20,13 @@ beforeAll(async () => {
 
 describe('basic', () => {
   test('ddl', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch, debug: true})
     const results = await con.execute(`SHOW TABLES`)
     expect(JSON.stringify(results)).toContain(`${table}`)
   })
 
   test('dml', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch,debug: true})
     await con.execute(`delete from ${table} where emp_no = 1`)
 
     await con.execute(`insert into ${table} values (1, 'John', 'Doe')`)
@@ -41,7 +41,7 @@ describe('basic', () => {
   })
 
   test('option', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch,debug: true})
     const result1 = await con.execute(`select * from ${table} where emp_no=0`,null, {arrayMode: true})
     const result2 = await con.execute(`select * from ${table} where emp_no=0`,null, {fullResult: true})
     const except1: Row[] = [[0, 'base', 'base']]
@@ -66,7 +66,7 @@ describe('basic', () => {
   })
 
   test('arrayMode with config and option', async () => {
-    const con = connect({url: databaseURL, database: database, fetch, arrayMode: true})
+    const con = connect({url: databaseURL, database: database, fetch, arrayMode: true,debug: true})
     const result1 = await con.execute(`select * from ${table} where emp_no=0`,null, {arrayMode: false})
     const result2 = await con.execute(`select * from ${table} where emp_no=0`)
     const except1: Row[] = [ { emp_no: 0, first_name: 'base', last_name: 'base' } ]
@@ -76,7 +76,7 @@ describe('basic', () => {
   })
 
   test('fullResult with config and option', async () => {
-    const con = connect({url: databaseURL, database: database, fetch, fullResult: true})
+    const con = connect({url: databaseURL, database: database, fetch, fullResult: true,debug: true})
     const result1 = await con.execute(`select * from ${table} where emp_no=0`,null, {fullResult: false})
     const result2 = await con.execute(`select * from ${table} where emp_no=0`)
     const except1: Row[] = [ { emp_no: 0, first_name: 'base', last_name: 'base' } ]
@@ -101,7 +101,7 @@ describe('basic', () => {
   })
 
   test('query with escape', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch,debug: true})
     await con.execute(`delete from ${table} where emp_no = 1 or emp_no = 2`)
     await con.execute(`insert into ${table} values (1, '\\'John\\'', 'Doe')`)
     await con.execute(`insert into ${table} values (2, '\\"John\\"', 'Doe')`)
@@ -119,7 +119,7 @@ describe('basic', () => {
   })
 
   test('transaction isolation', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch,debug: true})
     await con.execute(`delete from ${table} where emp_no = 1`)
     let tx
     try{
@@ -139,7 +139,7 @@ describe('basic', () => {
   })
 
   test('transaction rollback', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch,debug: true})
     await con.execute(`delete from ${table} where emp_no = 1`)
 
     let tx
@@ -162,7 +162,7 @@ describe('basic', () => {
   })
 
   test('transaction isolation level', async () => {
-    const con = connect({url: databaseURL, database: database, fetch})
+    const con = connect({url: databaseURL, database: database, fetch,debug: true})
     await con.execute(`delete from ${table} where emp_no = 1`)
 
     const tx = await con.begin({isolation:"READ COMMITTED"})
