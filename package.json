@@ -24,7 +24,7 @@
     "clean": "rm -rf dist/",
     "prebuild": "npm run clean",
     "build": "tsup",
-    "lint": "eslint src/",
+    "lint": "eslint src/ integration-test/",
     "pretest": "npm run build",
     "test": "jest __tests__ --passWithNoTests",
     "integrationTest": "npm run build && jest integration-test --passWithNoTests",

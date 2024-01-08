@@ -1,8 +1,8 @@
-import { connect,Row,FullResult } from '../dist/index'
+import { connect, Row, FullResult } from '../dist/index'
 import { fetch } from 'undici'
-import * as dotenv from 'dotenv';
+import * as dotenv from 'dotenv'
 
-dotenv.config();
+dotenv.config()
 const databaseURL = process.env.DATABASE_URL
 const database = 'test_serverless_type'
 const table = 'multi_data_type'
@@ -46,7 +46,7 @@ const multiDataTable = `
 );
 `
 
-const nullResult =    {
+const nullResult = {
   t_tinyint: null,
   t_tinyint_unsigned: null,
   t_smallint: null,
@@ -101,66 +101,65 @@ VALUES ( -128, 255, -32768, 65535, -8388608, 16777215, -2147483648, 1, -92233720
 `
 
 const fullTypeResult = {
-      t_tinyint: -128,
-      t_tinyint_unsigned: 255,
-      t_smallint: -32768,
-      t_smallint_unsigned: 65535,
-      t_mediumint: -8388608,
-      t_mediumint_unsigned: 16777215,
-      t_int: -2147483648,
-      t_int_unsigned: 1,
-      t_bigint: '-9223372036854775808',
-      t_bigint_unsigned: '18446744073709551615',
-      t_boolean: 1,
-      t_float: 123.46,
-      t_double: 123.12,
-      t_decimal: '123456789012.1234567890120000000',
-      t_char: '测',
-      t_varchar: '测试',
-      c_binary: '�PNG\r\n\x1A\n\x00\x00\x00\x00\x00\x00\x00\x00',
-      c_varbinary: '�PNG\r\n\x1A\n',
-      t_tinytext: '测试tinytext',
-      t_text: '0',
-      t_mediumtext: '测试mediumtext',
-      t_longtext: '测试longtext',
-      t_tinyblob: 'tinyblob',
-      t_blob: 'blob',
-      t_mediumblob: 'mediumblob',
-      t_longblob: 'longblob',
-      t_date: '1977-01-01',
-      t_datetime: '9999-12-31 23:59:59',
-      t_timestamp: '1973-12-30 15:30:00',
-      t_time: '23:59:59',
-      t_year: 2154,
-      t_enum: 'enum2',
-      t_set: 'a,b',
-      t_bit: '\x00\x00\x00\x00\x00\x00\x00U',
-      t_json: { a: 1, b: '2' }
-    }
+  t_tinyint: -128,
+  t_tinyint_unsigned: 255,
+  t_smallint: -32768,
+  t_smallint_unsigned: 65535,
+  t_mediumint: -8388608,
+  t_mediumint_unsigned: 16777215,
+  t_int: -2147483648,
+  t_int_unsigned: 1,
+  t_bigint: '-9223372036854775808',
+  t_bigint_unsigned: '18446744073709551615',
+  t_boolean: 1,
+  t_float: 123.46,
+  t_double: 123.12,
+  t_decimal: '123456789012.1234567890120000000',
+  t_char: '测',
+  t_varchar: '测试',
+  c_binary: '�PNG\r\n\x1A\n\x00\x00\x00\x00\x00\x00\x00\x00',
+  c_varbinary: '�PNG\r\n\x1A\n',
+  t_tinytext: '测试tinytext',
+  t_text: '0',
+  t_mediumtext: '测试mediumtext',
+  t_longtext: '测试longtext',
+  t_tinyblob: 'tinyblob',
+  t_blob: 'blob',
+  t_mediumblob: 'mediumblob',
+  t_longblob: 'longblob',
+  t_date: '1977-01-01',
+  t_datetime: '9999-12-31 23:59:59',
+  t_timestamp: '1973-12-30 15:30:00',
+  t_time: '23:59:59',
+  t_year: 2154,
+  t_enum: 'enum2',
+  t_set: 'a,b',
+  t_bit: '\x00\x00\x00\x00\x00\x00\x00U',
+  t_json: { a: 1, b: '2' }
+}
 
 beforeAll(async () => {
-  const con = connect({url: databaseURL, fetch,debug: true})
+  const con = connect({ url: databaseURL, fetch, debug: true })
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(multiDataTable)
-},20000);
+}, 20000)
 
 describe('types', () => {
-
   test('test null', async () => {
-    const con = connect({url: databaseURL, database: database, fetch,debug: true})
+    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute('insert into multi_data_type values ()')
-    const r = await con.execute('select * from multi_data_type',null, {fullResult: true}) as FullResult
+    const r = (await con.execute('select * from multi_data_type', null, { fullResult: true })) as FullResult
     expect(r.rows.length).toEqual(1)
     expect(JSON.stringify(r.rows[0])).toEqual(JSON.stringify(nullResult))
   })
 
   test('test all types', async () => {
-    const con = connect({url: databaseURL, database: database, fetch,debug: true})
+    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
-    const rows = await con.execute('select * from multi_data_type') as Row[]
+    const rows = (await con.execute('select * from multi_data_type')) as Row[]
     expect(rows.length).toEqual(1)
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })
