@@ -108,7 +108,11 @@ export class Connection {
   ): Promise<FullResult | Row[]> {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
-    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '', sql == 'BEGIN' ? txOptions.isolation : null)
+    const debug = options.debug ?? this.config.debug ?? false
+    if (debug) {
+      console.log(`[serverless-js debug] sql: ${sql}`)
+    }
+    const resp = await postQuery<QueryExecuteResponse>(this.config, body, this.session ?? '', sql == 'BEGIN' ? txOptions.isolation : null,debug)
 
     this.session = resp?.session ?? null
     if (this.session === null || this.session === '') {

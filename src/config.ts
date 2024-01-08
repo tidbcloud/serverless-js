@@ -24,12 +24,14 @@ export interface Config {
   arrayMode?: boolean
   fullResult?: boolean
   decoders?: Decoders
+  debug?: boolean
 }
 
 export interface ExecuteOptions {
   arrayMode?: boolean
   fullResult?: boolean
   decoders?: Decoders
+  debug?: boolean
 }
 
 export interface TxOptions {
