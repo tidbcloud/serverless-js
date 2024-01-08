@@ -60,5 +60,6 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
 }
 
 function generateUniqueId() {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).substring(2, 8)}`
+  const datetime = new Date().toISOString().replace(/[^\d]/g, '').slice(0, 14);
+  return `${datetime}${Math.random().toString(36).substring(2, 12)}${Math.random().toString(36).substring(2, 12)}`
 }
