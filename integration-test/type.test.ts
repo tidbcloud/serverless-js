@@ -1,6 +1,6 @@
 import { connect, Row, FullResult } from '../dist/index'
-import * as dotenv from 'dotenv'
 import { fetch } from 'undici'
+import * as dotenv from 'dotenv'
 
 dotenv.config()
 const databaseURL = process.env.DATABASE_URL
@@ -143,7 +143,7 @@ beforeAll(async () => {
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(multiDataTable)
-}, 30000)
+}, 20000)
 
 describe('types', () => {
   test('test null', async () => {
