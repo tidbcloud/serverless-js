@@ -142,9 +142,9 @@ beforeAll(async () => {
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(multiDataTable)
-})
+},30000)
 
-describe('types', () => {
+
   test('test null', async () => {
     const con = connect({ url: databaseURL, database: database, debug: true })
     await con.execute(`delete from ${table}`)
@@ -162,4 +162,4 @@ describe('types', () => {
     expect(rows.length).toEqual(1)
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   },1000)
-})
+
