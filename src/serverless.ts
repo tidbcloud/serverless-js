@@ -1,13 +1,19 @@
 import { Config } from './config.js'
 import { DatabaseError } from './error.js'
 import { Version } from './version.js'
-export async function postQuery<T>(config: Config, body, session = '', isolationLevel = null): Promise<T> {
+export async function postQuery<T>(config: Config, body, session = '', isolationLevel = null, debug): Promise<T> {
   let fetchCacheOption: Record<string, any> = { cache: 'no-store' }
   // Cloudflare Workers does not support cache now https://github.com/cloudflare/workerd/issues/69
   try {
     new Request('x:', fetchCacheOption)
   } catch (err) {
     fetchCacheOption = {}
+  }
+
+  // generate request Id
+  const requestId = generateUniqueId()
+  if (debug) {
+    console.log(`[serverless-js debug] request id: ${requestId}`)
   }
 
   const url = new URL('/v1beta/sql', `https://http-${config.host}`)
@@ -19,7 +25,8 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     'User-Agent': `serverless-js/${Version}`,
     Authorization: `Basic ${auth}`,
     'TiDB-Database': database,
-    'TiDB-Session': session
+    'TiDB-Session': session,
+    'X-Debug-Trace-Id': requestId
   }
   if (isolationLevel) {
     headers['TiDB-Isolation-Level'] = isolationLevel
@@ -30,6 +37,11 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     headers,
     ...fetchCacheOption
   })
+
+  if (debug) {
+    const traceId = response?.headers?.get('X-Debug-Trace-Id')
+    console.log(`[serverless-js debug] response id: ${traceId}`)
+  }
 
   if (response.ok) {
     const resp = await response.json()
@@ -46,4 +58,20 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     }
     throw error
   }
+}
+
+// simulate xid
+function generateUniqueId() {
+  const datetime = new Date().toISOString().replace(/[^\d]/g, '').slice(0, 14)
+  return `${datetime}${randomString(20)}`
+}
+
+function randomString(n) {
+  let result = ''
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  const l = characters.length
+  for (let i = 0; i < n; i++) {
+    result += characters[Math.floor(Math.random() * l)]
+  }
+  return result
 }
