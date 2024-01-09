@@ -1,5 +1,6 @@
 import { connect, Row, FullResult } from '../dist/index'
 import * as dotenv from 'dotenv'
+import { fetch } from 'undici'
 
 dotenv.config()
 const databaseURL = process.env.DATABASE_URL
@@ -138,7 +139,7 @@ const fullTypeResult = {
 }
 
 beforeAll(async () => {
-  const con = connect({ url: databaseURL, debug: true })
+  const con = connect({ url: databaseURL, fetch, debug: true })
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(multiDataTable)
@@ -146,20 +147,20 @@ beforeAll(async () => {
 
 describe('types', () => {
   test('test null', async () => {
-    const con = connect({ url: databaseURL, database: database, debug: true })
+    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute('insert into multi_data_type values ()')
     const r = (await con.execute('select * from multi_data_type', null, { fullResult: true })) as FullResult
     expect(r.rows.length).toEqual(1)
     expect(JSON.stringify(r.rows[0])).toEqual(JSON.stringify(nullResult))
-  },1000)
+  }, 1000)
 
   test('test all types', async () => {
-    const con = connect({ url: databaseURL, database: database, debug: true })
+    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
     const rows = (await con.execute('select * from multi_data_type')) as Row[]
     expect(rows.length).toEqual(1)
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
-  },1000)
+  }, 1000)
 })
