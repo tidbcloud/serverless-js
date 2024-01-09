@@ -142,7 +142,7 @@ beforeAll(async () => {
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(multiDataTable)
-}, 20000)
+})
 
 describe('types', () => {
   test('test null', async () => {

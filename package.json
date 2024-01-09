@@ -27,7 +27,7 @@
     "lint": "eslint src/ integration-test/",
     "pretest": "npm run build",
     "test": "jest __tests__ --passWithNoTests",
-    "integrationTest": "npm run build && jest integration-test --passWithNoTests  --openHandlesTimeout 1",
+    "integrationTest": "npm run build && jest integration-test --passWithNoTests --maxWorkers 1",
     "version": "echo \"export const Version = '$npm_package_version'\" > src/version.ts",
     "prepublishOnly": "npm run build"
   },
