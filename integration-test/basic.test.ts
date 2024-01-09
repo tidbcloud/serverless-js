@@ -1,5 +1,5 @@
 import { connect, Row, FullResult } from '../dist/index'
-import { fetch } from 'undici'
+import { fetch } from 'node-fetch'
 import * as dotenv from 'dotenv'
 
 let databaseURL
