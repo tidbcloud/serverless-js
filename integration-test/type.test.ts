@@ -1,5 +1,4 @@
 import { connect, Row, FullResult } from '../dist/index'
-import { fetch } from 'undici'
 import * as dotenv from 'dotenv'
 
 dotenv.config()
@@ -139,7 +138,7 @@ const fullTypeResult = {
 }
 
 beforeAll(async () => {
-  const con = connect({ url: databaseURL, fetch, debug: true })
+  const con = connect({ url: databaseURL, debug: true })
   await con.execute(`DROP DATABASE IF EXISTS ${database}`)
   await con.execute(`CREATE DATABASE ${database}`)
   await con.execute(multiDataTable)
@@ -147,7 +146,7 @@ beforeAll(async () => {
 
 describe('types', () => {
   test('test null', async () => {
-    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
+    const con = connect({ url: databaseURL, database: database, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute('insert into multi_data_type values ()')
     const r = (await con.execute('select * from multi_data_type', null, { fullResult: true })) as FullResult
@@ -156,7 +155,7 @@ describe('types', () => {
   })
 
   test('test all types', async () => {
-    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
+    const con = connect({ url: databaseURL, database: database, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
     const rows = (await con.execute('select * from multi_data_type')) as Row[]
