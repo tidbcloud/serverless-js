@@ -35,7 +35,6 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     method: 'POST',
     body: body,
     headers,
-    signal: AbortSignal.timeout(5000),
     ...fetchCacheOption
   })
 
