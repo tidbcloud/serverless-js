@@ -152,7 +152,7 @@ describe('types', () => {
     const r = (await con.execute('select * from multi_data_type', null, { fullResult: true })) as FullResult
     expect(r.rows.length).toEqual(1)
     expect(JSON.stringify(r.rows[0])).toEqual(JSON.stringify(nullResult))
-  })
+  },1000)
 
   test('test all types', async () => {
     const con = connect({ url: databaseURL, database: database, debug: true })
@@ -161,5 +161,5 @@ describe('types', () => {
     const rows = (await con.execute('select * from multi_data_type')) as Row[]
     expect(rows.length).toEqual(1)
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
-  })
+  },1000)
 })
