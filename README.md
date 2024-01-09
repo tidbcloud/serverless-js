@@ -1,4 +1,4 @@
-# TiDB Cloud Serverless Driver for JavaScript
+d# TiDB Cloud Serverless Driver for JavaScript
 
 This driver is for serverless and edge compute platforms that require HTTP external connections, such as Vercel Edge Functions or Cloudflare Workers.
 
