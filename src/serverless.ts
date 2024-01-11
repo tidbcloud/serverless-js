@@ -26,7 +26,8 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     Authorization: `Basic ${auth}`,
     'TiDB-Database': database,
     'TiDB-Session': session,
-    'X-Debug-Trace-Id': requestId
+    'X-Debug-Trace-Id': requestId,
+    'Accept-Encoding': 'gzip'
   }
   if (isolationLevel) {
     headers['TiDB-Isolation-Level'] = isolationLevel
@@ -41,6 +42,8 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
   if (debug) {
     const traceId = response?.headers?.get('X-Debug-Trace-Id')
     console.log(`[serverless-js debug] response id: ${traceId}`)
+    const contentEncoding = response?.headers?.get('Content-Encoding')
+    console.log(`[serverless-js debug] Content-Encoding: ${contentEncoding}`)
   }
 
   if (response.ok) {
