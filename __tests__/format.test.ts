@@ -127,5 +127,11 @@ describe('format', () => {
       const expected = "select 1 from user where state = '\\Za\\Z'"
       expect(format(query, ['\x1aa\x1a'])).toEqual(expected)
     })
+
+    test('formats bigint values', () => {
+      const query = 'select 1 from user where id=? and id2=?'
+      const expected = 'select 1 from user where id=1 and id2=9223372036854775807'
+      expect(format(query, [1n,9223372036854775807n])).toEqual(expected)
+    })
   })
 })
