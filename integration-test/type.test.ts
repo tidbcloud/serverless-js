@@ -1,7 +1,7 @@
 import { connect, Row, FullResult } from '../dist/index'
 import { fetch } from 'undici'
 import * as dotenv from 'dotenv'
-import {uint8ArrayToHex} from "../src/format";
+import { uint8ArrayToHex } from '../src/format'
 
 dotenv.config()
 const databaseURL = process.env.DATABASE_URL
@@ -160,7 +160,7 @@ describe('types', () => {
   })
 
   test('test all types', async () => {
-    const con = connect({ url: databaseURL, database: database, fetch})
+    const con = connect({ url: databaseURL, database: database, fetch })
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
     const rows = (await con.execute('select * from multi_data_type')) as Row[]
@@ -169,13 +169,13 @@ describe('types', () => {
     rows[0]['c_binary'] = Buffer.from(rows[0]['c_binary']).toString('base64')
     rows[0]['c_varbinary'] = Buffer.from(rows[0]['c_varbinary']).toString('base64')
     // blob type returns Uint8Array, encode with utf8
-    rows[0]['t_tinyblob']=Buffer.from(rows[0]['t_tinyblob']).toString()
-    rows[0]['t_blob']=Buffer.from(rows[0]['t_blob']).toString()
-    rows[0]['t_mediumblob']=Buffer.from(rows[0]['t_mediumblob']).toString()
-    rows[0]['t_longblob']=Buffer.from(rows[0]['t_longblob']).toString()
+    rows[0]['t_tinyblob'] = Buffer.from(rows[0]['t_tinyblob']).toString()
+    rows[0]['t_blob'] = Buffer.from(rows[0]['t_blob']).toString()
+    rows[0]['t_mediumblob'] = Buffer.from(rows[0]['t_mediumblob']).toString()
+    rows[0]['t_longblob'] = Buffer.from(rows[0]['t_longblob']).toString()
     // bit type returns Uint8Array, get it with hex
-    rows[0]['t_bit']=uint8ArrayToHex(rows[0]['t_bit'])
+    rows[0]['t_bit'] = uint8ArrayToHex(rows[0]['t_bit'])
 
-   expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
+    expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })
 })

@@ -1,5 +1,5 @@
-import {Decoders} from './config'
-import {Field} from './index.js'
+import { Decoders } from './config'
+import { Field } from './index.js'
 
 export function cast(field: Field, value: string | null, decoder: Decoders): any {
   if (value === null) {
@@ -57,9 +57,9 @@ export function cast(field: Field, value: string | null, decoder: Decoders): any
 }
 
 function hexToUint8Array(hexString: string): Uint8Array {
-  const uint8Array = new Uint8Array(hexString.length / 2);
+  const uint8Array = new Uint8Array(hexString.length / 2)
   for (let i = 0; i < hexString.length; i += 2) {
-    uint8Array[i / 2] = parseInt(hexString.substring(i, i + 2), 16);
+    uint8Array[i / 2] = parseInt(hexString.substring(i, i + 2), 16)
   }
-  return uint8Array;
+  return uint8Array
 }
