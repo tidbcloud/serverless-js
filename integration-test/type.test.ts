@@ -178,4 +178,28 @@ describe('types', () => {
 
     expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })
+
+  test('test raw bytes as input', async () => {
+    const con = connect({ url: databaseURL, database: database, fetch })
+    const tableName = 'raw_bytes'
+    const tableDDL = `
+    create table ${tableName} (
+      bytes blob
+    )`
+    await con.execute(`DROP table IF EXISTS ${tableName}`)
+    await con.execute(tableDDL)
+
+    const input = 'FSDF'
+    const inputAsBuffer = Buffer.from(input, 'base64')
+    await con.execute(`insert into ${tableName} values (?)`, [inputAsBuffer])
+    const rows = (await con.execute(`select * from ${tableName}`)) as Row[]
+
+    console.log(rows)
+    expect(rows.length).toEqual(1)
+    const outputRaw = rows[0]['bytes']
+    const outputAsBuffer = Buffer.from(outputRaw)
+    const output = outputAsBuffer.toString('base64')
+
+    expect(input).toEqual(output)
+  })
 })
