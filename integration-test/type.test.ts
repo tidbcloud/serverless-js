@@ -1,6 +1,7 @@
 import { connect, Row, FullResult } from '../dist/index'
 import { fetch } from 'undici'
 import * as dotenv from 'dotenv'
+import {uint8ArrayToHex} from "../src/format";
 
 dotenv.config()
 const databaseURL = process.env.DATABASE_URL
@@ -24,7 +25,7 @@ const multiDataTable = `
     t_decimal            DECIMAL(38, 19),
     t_char               CHAR,
     t_varchar            VARCHAR(10),
-    c_binary             binary(16),
+    c_binary             binary(3),
     c_varbinary          varbinary(16),
     t_tinytext           TINYTEXT,
     t_text               TEXT,
@@ -84,6 +85,9 @@ const nullResult = {
   t_json: null
 }
 
+// binary: x'1520c5' is the hex of 'FSDF' decoded from base64 (1520c5 has 3 bytes)
+// blob : assume tidb serverless decode them with utf8
+// bit: b'01010101' convert to hex is 55 (85 in 10 base)
 const insertSQL = `
 INSERT INTO ${database}.${table}( t_tinyint, t_tinyint_unsigned, t_smallint, t_smallint_unsigned, t_mediumint
                            , t_mediumint_unsigned, t_int, t_int_unsigned, t_bigint, t_bigint_unsigned
@@ -94,7 +98,7 @@ INSERT INTO ${database}.${table}( t_tinyint, t_tinyint_unsigned, t_smallint, t_s
                            , t_enum,t_bit, t_set, t_json)
 VALUES ( -128, 255, -32768, 65535, -8388608, 16777215, -2147483648, 1, -9223372036854775808, 18446744073709551615
        , true, 123.456, 123.123, 123456789012.123456789012
-       , '测', '测试', x'89504E470D0A1A0A', x'89504E470D0A1A0A', '测试tinytext', '0', '测试mediumtext', '测试longtext'
+       , '测', '测试', x'1520c5', x'1520c5', '测试tinytext', '0', '测试mediumtext', '测试longtext'
        , 'tinyblob', 'blob', 'mediumblob', 'longblob'
        , '1977-01-01', '9999-12-31 23:59:59', '19731230153000', '23:59:59', '2154'
        , 'enum2',b'01010101', 'a,b','{"a":1,"b":"2"}')
@@ -117,8 +121,8 @@ const fullTypeResult = {
   t_decimal: '123456789012.1234567890120000000',
   t_char: '测',
   t_varchar: '测试',
-  c_binary: '�PNG\r\n\x1A\n\x00\x00\x00\x00\x00\x00\x00\x00',
-  c_varbinary: '�PNG\r\n\x1A\n',
+  c_binary: 'FSDF',
+  c_varbinary: 'FSDF',
   t_tinytext: '测试tinytext',
   t_text: '0',
   t_mediumtext: '测试mediumtext',
@@ -134,7 +138,7 @@ const fullTypeResult = {
   t_year: 2154,
   t_enum: 'enum2',
   t_set: 'a,b',
-  t_bit: '\x00\x00\x00\x00\x00\x00\x00U',
+  t_bit: '0x0000000000000055',
   t_json: { a: 1, b: '2' }
 }
 
@@ -156,11 +160,22 @@ describe('types', () => {
   })
 
   test('test all types', async () => {
-    const con = connect({ url: databaseURL, database: database, fetch, debug: true })
+    const con = connect({ url: databaseURL, database: database, fetch})
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
     const rows = (await con.execute('select * from multi_data_type')) as Row[]
     expect(rows.length).toEqual(1)
-    expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
+    // binary type returns Uint8Array, encode with base64
+    rows[0]['c_binary'] = Buffer.from(rows[0]['c_binary']).toString('base64')
+    rows[0]['c_varbinary'] = Buffer.from(rows[0]['c_varbinary']).toString('base64')
+    // blob type returns Uint8Array, encode with utf8
+    rows[0]['t_tinyblob']=Buffer.from(rows[0]['t_tinyblob']).toString()
+    rows[0]['t_blob']=Buffer.from(rows[0]['t_blob']).toString()
+    rows[0]['t_mediumblob']=Buffer.from(rows[0]['t_mediumblob']).toString()
+    rows[0]['t_longblob']=Buffer.from(rows[0]['t_longblob']).toString()
+    // bit type returns Uint8Array, get it with hex
+    rows[0]['t_bit']=uint8ArrayToHex(rows[0]['t_bit'])
+
+   expect(JSON.stringify(rows[0])).toEqual(JSON.stringify(fullTypeResult))
   })
 })

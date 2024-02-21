@@ -36,7 +36,6 @@ function sanitize(value: Value): string {
   }
 
   if (value instanceof Uint8Array) {
-    console.log("input convert to:"+uint8ArrayToHex(value))
     return uint8ArrayToHex(value)
   }
 
