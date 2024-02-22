@@ -35,6 +35,10 @@ function sanitize(value: Value): string {
     return value ? 'true' : 'false'
   }
 
+  if (value instanceof Uint8Array) {
+    return uint8ArrayToHex(value)
+  }
+
   if (typeof value === 'string') {
     return quote(value)
   }
@@ -83,4 +87,9 @@ function replacement(text: string): string {
     default:
       return ''
   }
+}
+
+export function uint8ArrayToHex(uint8: Uint8Array): string {
+  const digits = Array.from(uint8).map((i) => i.toString(16).padStart(2, '0'))
+  return `0x${digits.join('')}`
 }

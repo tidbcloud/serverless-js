@@ -32,25 +32,34 @@ export function cast(field: Field, value: string | null, decoder: Decoders): any
     case 'DECIMAL':
     case 'CHAR':
     case 'VARCHAR':
-    case 'BINARY':
-    case 'VARBINARY':
-    case 'TINYTEXT':
     case 'TEXT':
     case 'MEDIUMTEXT':
     case 'LONGTEXT':
-    case 'TINYBLOB':
-    case 'BLOB':
-    case 'MEDIUMBLOB':
-    case 'LONGBLOB':
+    case 'TINYTEXT':
     case 'DATE':
     case 'TIME':
     case 'DATETIME':
     case 'TIMESTAMP':
-    case 'BIT':
       return value
+    case 'BLOB':
+    case 'TINYBLOB':
+    case 'MEDIUMBLOB':
+    case 'LONGBLOB':
+    case 'BINARY':
+    case 'VARBINARY':
+    case 'BIT':
+      return hexToUint8Array(value)
     case 'JSON':
       return JSON.parse(value)
     default:
       return value
   }
+}
+
+function hexToUint8Array(hexString: string): Uint8Array {
+  const uint8Array = new Uint8Array(hexString.length / 2)
+  for (let i = 0; i < hexString.length; i += 2) {
+    uint8Array[i / 2] = parseInt(hexString.substring(i, i + 2), 16)
+  }
+  return uint8Array
 }
