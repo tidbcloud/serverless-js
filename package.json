@@ -1,6 +1,6 @@
 {
   "name": "@tidbcloud/serverless",
-  "version": "0.0.11-beta2",
+  "version": "0.1.0",
   "description": "TiDB Cloud Serverless Driver",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
