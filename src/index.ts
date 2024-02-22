@@ -1,10 +1,10 @@
 import { format } from './format.js'
 import { cast } from './decode.js'
 import { DatabaseError } from './error.js'
-import { Config, ExecuteOptions, ExecuteArgs, TxOptions, Decoders } from './config.js'
+import { Config, ExecuteOptions, ExecuteArgs, TxOptions, Decoders, ColumnType } from './config.js'
 import { postQuery } from './serverless.js'
 
-export { Config, ExecuteOptions, ExecuteArgs, DatabaseError }
+export { Config, ExecuteOptions, ExecuteArgs, DatabaseError, Decoders, ColumnType }
 
 // serverless driver returns a full result by default
 export type Row = Record<string, any> | any[]
