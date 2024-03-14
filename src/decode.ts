@@ -26,7 +26,6 @@ export function cast(field: Field, value: string | null, decoder: Decoders): any
     case 'FLOAT':
     case 'DOUBLE':
       return parseFloat(value)
-    // set and enum will be converted to char.
     case 'BIGINT':
     case 'UNSIGNED BIGINT':
     case 'DECIMAL':
