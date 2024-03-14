@@ -30,6 +30,8 @@ export function cast(field: Field, value: string | null, decoder: Decoders): any
     case 'BIGINT':
     case 'UNSIGNED BIGINT':
     case 'DECIMAL':
+    case 'SET':
+    case 'ENUM':
     case 'CHAR':
     case 'VARCHAR':
     case 'TEXT':
