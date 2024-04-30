@@ -43,6 +43,10 @@ try {
 }
 ```
 
+> **Note:**
+> 
+> The transaction is not concurrent-safe. You are not allowed to run SQLs parallel in the same transaction.
+
 **Edge example**
 
 The serverless driver is suitable for the edge environments. See how to use it with Vercel Edge Functions:
