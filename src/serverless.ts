@@ -48,7 +48,7 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
 
   if (response.ok) {
     const resp = await response.json()
-    if ( resp.sLastInsertID && resp.sLastInsertID != "0"){
+    if ( resp.sLastInsertID ){
       resp.lastInsertId = BigInt(resp.sLastInsertID)
     }
     const session = response.headers.get('TiDB-Session')
