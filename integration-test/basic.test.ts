@@ -59,7 +59,7 @@ describe('basic', () => {
           last_name: 'base'
         }
       ],
-      rowsAffected: 0,
+      rowsAffected: null,
       lastInsertId: null,
       rowCount: 1
     }
@@ -96,7 +96,7 @@ describe('basic', () => {
           last_name: 'base'
         }
       ],
-      rowsAffected: 0,
+      rowsAffected: null,
       lastInsertId: null,
       rowCount: 1
     }
