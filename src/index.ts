@@ -15,7 +15,7 @@ export interface FullResult {
   statement: string
   rowCount: number | null
   rowsAffected: number | null
-  lastInsertId: number | null
+  lastInsertId: bigint | null
 }
 
 // serverless backend results
@@ -30,7 +30,7 @@ interface QueryExecuteResponse {
   types: Field[] | null
   rows: string[][] | null
   rowsAffected: number | null
-  lastInsertID: number | null
+  lastInsertId: bigint | null
 }
 
 const defaultExecuteOptions: ExecuteOptions = {}
@@ -134,7 +134,7 @@ export class Connection {
 
     if (fullResult) {
       const rowsAffected = resp?.rowsAffected ?? 0
-      const lastInsertId = resp?.lastInsertID ?? null
+      const lastInsertId = resp?.lastInsertId ?? null
       const typeByName = (acc, { name, type }) => ({ ...acc, [name]: type })
       const types = fields.reduce<Types>(typeByName, {})
       return {
