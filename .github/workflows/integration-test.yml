@@ -24,6 +24,7 @@ jobs:
           npm run integrationTest
   test-macos:
     runs-on: macos-latest
+    if: ${{ always() }}
     needs: test-ubuntu
     steps:
       - uses: actions/checkout@v4
