@@ -8,8 +8,24 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  test-ubuntu:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+      - name: Run integrationTest
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          npm ci
+          npm run integrationTest
+  test-macos:
+    runs-on: macos-latest
+    if: ${{ always() }}
+    needs: test-ubuntu
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
