@@ -8,6 +8,8 @@ const table = 'employee'
 
 const EmployeeTable = `CREATE TABLE ${database}.${table} (emp_no INT,first_name VARCHAR(255),last_name VARCHAR(255))`
 
+function assertType<T>(value: T): void {}
+
 beforeAll(async () => {
   dotenv.config()
   databaseURL = process.env.DATABASE_URL
@@ -22,6 +24,9 @@ describe('basic', () => {
   test('ddl', async () => {
     const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     const results = await con.execute(`SHOW TABLES`)
+
+    assertType<Row[]>(results)
+
     expect(JSON.stringify(results)).toContain(`${table}`)
   })
 
@@ -31,12 +36,20 @@ describe('basic', () => {
 
     await con.execute(`insert into ${table} values (1, 'John', 'Doe')`)
     const result1 = await con.execute(`select * from ${table} where emp_no = 1`)
+
+    assertType<Row[]>(result1)
     expect(JSON.stringify(result1)).toContain('John')
+
     await con.execute(`update ${table} set first_name = 'Jane' where emp_no = 1`)
     const result2 = await con.execute(`select * from ${table} where emp_no = 1`)
+
+    assertType<Row[]>(result2)
     expect(JSON.stringify(result2)).toContain('Jane')
+
     await con.execute(`delete from ${table} where emp_no = 1`)
-    const result3 = (await con.execute(`select * from ${table} where emp_no = 1`)) as Row[]
+    const result3 = await con.execute(`select * from ${table} where emp_no = 1`)
+
+    assertType<Row[]>(result3)
     expect(result3.length).toEqual(0)
   })
 
@@ -44,8 +57,12 @@ describe('basic', () => {
     const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     const result1 = await con.execute(`select * from ${table} where emp_no=0`, null, { arrayMode: true })
     const result2 = await con.execute(`select * from ${table} where emp_no=0`, null, { fullResult: true })
-    const except1: Row[] = [[0, 'base', 'base']]
-    const except2: FullResult = {
+
+    assertType<Row[]>(result1)
+    assertType<FullResult>(result2)
+
+    const expect1: Row[] = [[0, 'base', 'base']]
+    const expect2: FullResult = {
       statement: `select * from ${table} where emp_no=0`,
       types: {
         emp_no: 'INT',
@@ -63,26 +80,35 @@ describe('basic', () => {
       lastInsertId: null,
       rowCount: 1
     }
-    expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
-    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
+
+    expect(JSON.stringify(result1)).toEqual(JSON.stringify(expect1))
+    expect(JSON.stringify(result2)).toEqual(JSON.stringify(expect2))
   })
 
   test('arrayMode with config and option', async () => {
     const con = connect({ url: databaseURL, database: database, fetch, arrayMode: true, debug: true })
     const result1 = await con.execute(`select * from ${table} where emp_no=0`, null, { arrayMode: false })
     const result2 = await con.execute(`select * from ${table} where emp_no=0`)
-    const except1: Row[] = [{ emp_no: 0, first_name: 'base', last_name: 'base' }]
-    const except2: Row[] = [[0, 'base', 'base']]
-    expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
-    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
+
+    assertType<Row[]>(result1)
+    assertType<Row[]>(result2)
+
+    const expect1: Row[] = [{ emp_no: 0, first_name: 'base', last_name: 'base' }]
+    const expect2: Row[] = [[0, 'base', 'base']]
+    expect(JSON.stringify(result1)).toEqual(JSON.stringify(expect1))
+    expect(JSON.stringify(result2)).toEqual(JSON.stringify(expect2))
   })
 
   test('fullResult with config and option', async () => {
     const con = connect({ url: databaseURL, database: database, fetch, fullResult: true, debug: true })
     const result1 = await con.execute(`select * from ${table} where emp_no=0`, null, { fullResult: false })
     const result2 = await con.execute(`select * from ${table} where emp_no=0`)
-    const except1: Row[] = [{ emp_no: 0, first_name: 'base', last_name: 'base' }]
-    const except2: FullResult = {
+
+    assertType<Row[]>(result1)
+    assertType<FullResult>(result2)
+
+    const expect1: Row[] = [{ emp_no: 0, first_name: 'base', last_name: 'base' }]
+    const expect2: FullResult = {
       statement: `select * from ${table} where emp_no=0`,
       types: {
         emp_no: 'INT',
@@ -100,8 +126,8 @@ describe('basic', () => {
       lastInsertId: null,
       rowCount: 1
     }
-    expect(JSON.stringify(result1)).toEqual(JSON.stringify(except1))
-    expect(JSON.stringify(result2)).toEqual(JSON.stringify(except2))
+    expect(JSON.stringify(result1)).toEqual(JSON.stringify(expect1))
+    expect(JSON.stringify(result2)).toEqual(JSON.stringify(expect2))
   })
 
   test('query with escape', async () => {
@@ -111,9 +137,13 @@ describe('basic', () => {
     await con.execute(`insert into ${table} values (2, '\\"John\\"', 'Doe')`)
 
     // "select * from employee where first_name = '\\'John\\''"
-    const r1 = (await con.execute('select * from employee where first_name = ?', ["'John'"])) as Row[]
+    const r1 = await con.execute('select * from employee where first_name = ?', ["'John'"])
     // 'select * from employee where first_name = \'\\"John\\"\''
-    const r2 = (await con.execute('select * from employee where first_name =:name', { name: '"John"' })) as Row[]
+    const r2 = await con.execute('select * from employee where first_name =:name', { name: '"John"' })
+
+    assertType<Row[]>(r1)
+    assertType<Row[]>(r2)
+
     expect(r1.length).toEqual(1)
     expect(r2.length).toEqual(1)
     const row1 = r1[0] as Record<string, any>
@@ -129,8 +159,12 @@ describe('basic', () => {
     try {
       tx = await con.begin()
       await tx.execute(`insert into ${table} values (1, 'John', 'Doe')`)
-      const r1 = (await tx.execute(`select * from ${table} where emp_no = 1`)) as Row[]
-      const r2 = (await con.execute(`select * from ${table} where emp_no = 1`)) as Row[]
+      const r1 = await tx.execute(`select * from ${table} where emp_no = 1`)
+      const r2 = await con.execute(`select * from ${table} where emp_no = 1`)
+
+      assertType<Row[]>(r1)
+      assertType<Row[]>(r2)
+
       expect(r1.length).toEqual(1)
       expect(r2.length).toEqual(0)
       await tx.commit()
@@ -170,10 +204,12 @@ describe('basic', () => {
     await con.execute(`delete from ${table} where emp_no = 1`)
 
     const tx = await con.begin({ isolation: 'READ COMMITTED' })
-    const result1 = (await tx.execute(`select * from ${table}`)) as Row[]
+    const result1 = await tx.execute(`select * from ${table}`, null)
+    assertType<Row[]>(result1)
     await con.execute(`insert into ${table} values (1, '\\"John\\"', 'Doe')`)
-    const result2 = (await tx.execute(`select * from ${table}`)) as Row[]
+    const result2 = await tx.execute(`select * from ${table}`, null, { fullResult: true })
+    assertType<FullResult>(result2)
     await tx.commit()
-    expect(result1.length + 1).toEqual(result2.length)
+    expect(result1.length + 1).toEqual(result2.rows?.length ?? result2.rowCount)
   })
 })

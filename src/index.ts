@@ -35,36 +35,40 @@ interface QueryExecuteResponse {
 
 const defaultExecuteOptions: ExecuteOptions = {}
 
-export class Tx {
-  private conn: Connection
+export class Tx<T extends Config = {}> {
+  private conn: Connection<T>
 
-  constructor(conn: Connection) {
+  constructor(conn: Connection<T>) {
     this.conn = conn
   }
 
-  async execute(
+  async execute<E extends ExecuteOptions = {}>(
     query: string,
     args: ExecuteArgs = null,
-    options: ExecuteOptions = defaultExecuteOptions,
+    options: E = defaultExecuteOptions as E,
     txOptions: TxOptions = {}
-  ): Promise<FullResult | Row[]> {
+  ): Promise<
+  E extends { fullResult: boolean }
+    ? (E['fullResult'] extends true ? FullResult : Row[])
+    : (T['fullResult'] extends true ? FullResult : Row[])
+> {
     return this.conn.execute(query, args, options, txOptions)
   }
 
-  async commit(): Promise<FullResult | Row[]> {
+  async commit(): Promise<T['fullResult'] extends true ? FullResult : Row[]> {
     return this.conn.execute('COMMIT')
   }
 
-  async rollback(): Promise<FullResult | Row[]> {
+  async rollback(): Promise<T['fullResult'] extends true ? FullResult : Row[]> {
     return this.conn.execute('ROLLBACK')
   }
 }
 
-export class Connection {
-  private config: Config
+export class Connection<T extends Config = {}> {
+  private config: T
   private session: Session
 
-  constructor(config: Config) {
+  constructor(config: T) {
     this.session = null
     this.config = { ...config }
 
@@ -93,19 +97,23 @@ export class Connection {
     return this.config
   }
 
-  async begin(txOptions: TxOptions = {}): Promise<Tx> {
-    const conn = new Connection(this.config)
-    const tx = new Tx(conn)
-    await tx.execute('BEGIN', undefined, undefined, txOptions)
+  async begin(txOptions: TxOptions = {}) {
+    const conn = new Connection<T>(this.config)
+    const tx = new Tx<T>(conn)
+    await tx.execute<T>('BEGIN', undefined, undefined, txOptions)
     return tx
   }
 
-  async execute(
+  async execute<E extends ExecuteOptions = {}>(
     query: string,
     args: ExecuteArgs = null,
-    options: ExecuteOptions = defaultExecuteOptions,
+    options: E = defaultExecuteOptions as E,
     txOptions: TxOptions = {}
-  ): Promise<FullResult | Row[]> {
+  ): Promise<
+  E extends { fullResult: boolean }
+    ? (E['fullResult'] extends true ? FullResult : Row[])
+    : (T['fullResult'] extends true ? FullResult : Row[])
+  > {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
     const debug = options.debug ?? this.config.debug ?? false
@@ -144,17 +152,19 @@ export class Connection {
         rowsAffected,
         lastInsertId,
         rowCount: rows.length
-      }
+      } as any
     }
-    return rows
+
+    return rows as any
   }
 }
 
-export function connect(config: Config): Connection {
-  return new Connection(config)
+export function connect<T extends Config>(config: T): Connection<T> {
+  return new Connection<T>(config)
 }
 
 type Cast = typeof cast
+
 function parseArrayRow(fields: Field[], rawRow: string[], cast: Cast, decoders: Decoders): Row {
   return fields.map((field, ix) => {
     return cast(field, rawRow[ix], decoders)
