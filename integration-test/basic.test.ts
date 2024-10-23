@@ -8,7 +8,9 @@ const table = 'employee'
 
 const EmployeeTable = `CREATE TABLE ${database}.${table} (emp_no INT,first_name VARCHAR(255),last_name VARCHAR(255))`
 
-function assertType<T>(value: T): void {}
+function assertType<T>(value: T): void {
+  console.log(`Value is of type ${typeof value}`)
+}
 
 beforeAll(async () => {
   dotenv.config()
@@ -25,7 +27,7 @@ describe('basic', () => {
     const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     const results = await con.execute(`SHOW TABLES`)
 
-    assertType<Row[]>(results)
+    assertType<Row>(results)
 
     expect(JSON.stringify(results)).toContain(`${table}`)
   })

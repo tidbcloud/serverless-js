@@ -35,23 +35,27 @@ interface QueryExecuteResponse {
 
 const defaultExecuteOptions: ExecuteOptions = {}
 
-export class Tx<T extends Config = {}> {
+export class Tx<T extends Config> {
   private conn: Connection<T>
 
   constructor(conn: Connection<T>) {
     this.conn = conn
   }
 
-  async execute<E extends ExecuteOptions = {}>(
+  async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
     txOptions: TxOptions = {}
   ): Promise<
-  E extends { fullResult: boolean }
-    ? (E['fullResult'] extends true ? FullResult : Row[])
-    : (T['fullResult'] extends true ? FullResult : Row[])
-> {
+    E extends { fullResult: boolean }
+      ? E['fullResult'] extends true
+        ? FullResult
+        : Row[]
+      : T['fullResult'] extends true
+      ? FullResult
+      : Row[]
+  > {
     return this.conn.execute(query, args, options, txOptions)
   }
 
@@ -64,7 +68,7 @@ export class Tx<T extends Config = {}> {
   }
 }
 
-export class Connection<T extends Config = {}> {
+export class Connection<T extends Config> {
   private config: T
   private session: Session
 
@@ -104,15 +108,19 @@ export class Connection<T extends Config = {}> {
     return tx
   }
 
-  async execute<E extends ExecuteOptions = {}>(
+  async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
     txOptions: TxOptions = {}
   ): Promise<
-  E extends { fullResult: boolean }
-    ? (E['fullResult'] extends true ? FullResult : Row[])
-    : (T['fullResult'] extends true ? FullResult : Row[])
+    E extends { fullResult: boolean }
+      ? E['fullResult'] extends true
+        ? FullResult
+        : Row[]
+      : T['fullResult'] extends true
+      ? FullResult
+      : Row[]
   > {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })

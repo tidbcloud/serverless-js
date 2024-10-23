@@ -1,4 +1,4 @@
-import { connect, Row, FullResult } from '../dist/index'
+import { connect } from '../dist/index'
 import { fetch } from 'undici'
 import * as dotenv from 'dotenv'
 import { uint8ArrayToHex } from '../src/format'
