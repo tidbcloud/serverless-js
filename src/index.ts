@@ -47,15 +47,7 @@ export class Tx<T extends Config> {
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
     txOptions: TxOptions = {}
-  ): Promise<
-    E extends { fullResult: boolean }
-      ? E['fullResult'] extends true
-        ? FullResult
-        : Row[]
-      : T['fullResult'] extends true
-      ? FullResult
-      : Row[]
-  > {
+  ): Promise<ExecuteResult<E, T>> {
     return this.conn.execute(query, args, options, txOptions)
   }
 
@@ -67,6 +59,14 @@ export class Tx<T extends Config> {
     return this.conn.execute('ROLLBACK')
   }
 }
+
+export type ExecuteResult<E extends ExecuteOptions, T extends Config> = E extends { fullResult: boolean }
+  ? E['fullResult'] extends true
+    ? FullResult
+    : Row[]
+  : T['fullResult'] extends true
+  ? FullResult
+  : Row[]
 
 export class Connection<T extends Config> {
   private config: T
@@ -113,15 +113,7 @@ export class Connection<T extends Config> {
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
     txOptions: TxOptions = {}
-  ): Promise<
-    E extends { fullResult: boolean }
-      ? E['fullResult'] extends true
-        ? FullResult
-        : Row[]
-      : T['fullResult'] extends true
-      ? FullResult
-      : Row[]
-  > {
+  ): Promise<ExecuteResult<E, T>> {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
     const debug = options.debug ?? this.config.debug ?? false
@@ -160,10 +152,10 @@ export class Connection<T extends Config> {
         rowsAffected,
         lastInsertId,
         rowCount: rows.length
-      } as any
+      } as ExecuteResult<E, T>
     }
 
-    return rows as any
+    return rows as ExecuteResult<E, T>
   }
 }
 
