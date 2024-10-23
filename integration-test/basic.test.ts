@@ -8,7 +8,7 @@ const table = 'employee'
 
 const EmployeeTable = `CREATE TABLE ${database}.${table} (emp_no INT,first_name VARCHAR(255),last_name VARCHAR(255))`
 
-function assertType<T>(value: T): void {}
+function assertType<T>(_value: T): void {}
 
 beforeAll(async () => {
   dotenv.config()
