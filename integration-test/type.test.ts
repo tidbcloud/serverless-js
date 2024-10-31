@@ -1,4 +1,4 @@
-import { connect, Row, FullResult } from '../dist/index'
+import { connect } from '../dist/index'
 import { fetch } from 'undici'
 import * as dotenv from 'dotenv'
 import { uint8ArrayToHex } from '../src/format'
@@ -154,16 +154,17 @@ describe('types', () => {
     const con = connect({ url: databaseURL, database: database, fetch, debug: true })
     await con.execute(`delete from ${table}`)
     await con.execute('insert into multi_data_type values ()')
-    const r = (await con.execute('select * from multi_data_type', null, { fullResult: true })) as FullResult
-    expect(r.rows.length).toEqual(1)
-    expect(JSON.stringify(r.rows[0])).toEqual(JSON.stringify(nullResult))
+    const r = await con.execute('select * from multi_data_type', null, { fullResult: true })
+
+    expect(r.rows?.length).toEqual(1)
+    expect(JSON.stringify(r.rows?.[0])).toEqual(JSON.stringify(nullResult))
   })
 
   test('test all types', async () => {
     const con = connect({ url: databaseURL, database: database, fetch })
     await con.execute(`delete from ${table}`)
     await con.execute(insertSQL)
-    const rows = (await con.execute('select * from multi_data_type')) as Row[]
+    const rows = await con.execute('select * from multi_data_type')
     expect(rows.length).toEqual(1)
     // binary type returns Uint8Array, encode with base64
     rows[0]['c_binary'] = Buffer.from(rows[0]['c_binary']).toString('base64')
@@ -192,7 +193,7 @@ describe('types', () => {
     const input = 'FSDF'
     const inputAsBuffer = Buffer.from(input, 'base64')
     await con.execute(`insert into ${tableName} values (?)`, [inputAsBuffer])
-    const rows = (await con.execute(`select * from ${tableName}`)) as Row[]
+    const rows = await con.execute(`select * from ${tableName}`)
 
     console.log(rows)
     expect(rows.length).toEqual(1)
