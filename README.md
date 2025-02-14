@@ -6,7 +6,7 @@ This driver is for serverless and edge compute platforms that require HTTP exter
 
 **Install**
 
-You can install the driver with npm:
+You can install the driver with npm
 
 ```bash
 npm install @tidbcloud/serverless
