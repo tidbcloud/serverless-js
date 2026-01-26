@@ -178,7 +178,7 @@ export class Stateful<T extends Config> {
   constructor(conn: Connection<T>) {
     this.conn = conn
   }
-  
+
   async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,

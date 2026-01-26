@@ -1,14 +1,7 @@
 import { Config } from './config.js'
 import { DatabaseError } from './error.js'
 import { Version } from './version.js'
-export async function postQuery<T>(
-  config: Config,
-  body,
-  session = '',
-  isolationLevel = null,
-  debug,
-  statefulAction?: string
-): Promise<T> {
+export async function postQuery<T>(config: Config, body, session = '', isolationLevel = null, debug, statefulAction?: string): Promise<T> {
   let fetchCacheOption: Record<string, any> = { cache: 'no-store' }
   // Cloudflare Workers does not support cache now https://github.com/cloudflare/workerd/issues/69
   try {
