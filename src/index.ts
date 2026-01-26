@@ -69,8 +69,8 @@ export type ExecuteResult<E extends ExecuteOptions, T extends Config> = E extend
   : Row[]
 
 export class Connection<T extends Config> {
-  protected config: T
-  protected session: Session
+  private config: T
+  private session: Session
 
   constructor(config: T) {
     this.session = null
