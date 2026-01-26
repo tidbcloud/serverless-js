@@ -18,7 +18,7 @@ You can install the driver with npm:
 npm install @tidbcloud/serverless
 ```
 
-**Stateless connection**
+**Stateless Connection**
 
 To query from TiDB Serverless, you need to create a connection first. Then you can use the connection to execute raw SQL queries.
 
@@ -29,7 +29,7 @@ const conn = connect({url: 'mysql://username:password@host/database'})
 const results = await conn.execute('select * from test where id = ?',[1])
 ```
 
-**Stateful connection (Experimental)**
+**Stateful Connection (experimental)**
 
 If you want to keep session state across multiple queries, create a stateful connection. Remember to call `close()` to release the connection, or you may reach the connection limits.
 
@@ -52,7 +52,7 @@ try {
 }
 ```
 
-**Transaction (Experimental)**
+**Transaction (experimental)**
 
 You can also perform interactive transactions with the serverless driver. For example:
 
