@@ -69,8 +69,8 @@ export type ExecuteResult<E extends ExecuteOptions, T extends Config> = E extend
   : Row[]
 
 export class Connection<T extends Config> {
-  private config: T
-  private session: Session
+  protected config: T
+  protected session: Session
 
   constructor(config: T) {
     this.session = null
@@ -108,11 +108,19 @@ export class Connection<T extends Config> {
     return tx
   }
 
+  async stateful() {
+    const conn = new Connection<T>(this.config)
+    await conn.execute('', null, defaultExecuteOptions as ExecuteOptions, {}, 'open')
+    const stateful = new Stateful<T>(conn)
+    return stateful
+  }
+
   async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
-    txOptions: TxOptions = {}
+    txOptions: TxOptions = {},
+    statefulAction?: 'open' | 'close'
   ): Promise<ExecuteResult<E, T>> {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
@@ -125,7 +133,8 @@ export class Connection<T extends Config> {
       body,
       this.session ?? '',
       sql == 'BEGIN' ? txOptions.isolation : null,
-      debug
+      debug,
+      statefulAction
     )
 
     this.session = resp?.session ?? null
@@ -155,7 +164,32 @@ export class Connection<T extends Config> {
       } as ExecuteResult<E, T>
     }
 
+    if (debug) {
+      console.log(`[serverless-js debug] session: ${this.session}`)
+    }
+
     return rows as ExecuteResult<E, T>
+  }
+}
+
+export class Stateful<T extends Config> {
+  private conn: Connection<T>
+
+  constructor(conn: Connection<T>) {
+    this.conn = conn
+  }
+  
+  async execute<E extends ExecuteOptions>(
+    query: string,
+    args: ExecuteArgs = null,
+    options: E = defaultExecuteOptions as E,
+    txOptions: TxOptions = {}
+  ): Promise<ExecuteResult<E, T>> {
+    return this.conn.execute(query, args, options, txOptions)
+  }
+
+  async close(): Promise<void> {
+    await this.conn.execute('', null, defaultExecuteOptions as ExecuteOptions, {}, 'close')
   }
 }
 
