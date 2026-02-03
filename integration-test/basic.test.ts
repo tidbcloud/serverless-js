@@ -212,4 +212,34 @@ describe('basic', () => {
     await tx.commit()
     expect(result1.length + 1).toEqual(result2.rows?.length ?? result2.rowCount)
   })
+
+  test('stateful connection normal flow', async () => {
+    const conn = connect({ url: databaseURL, database: database, fetch, debug: true })
+    const stateful = await conn.persist()
+
+    await stateful.execute(`use mysql`)
+    await expect(stateful.execute(`select * from ${table} where emp_no = 0`)).rejects.toThrow()
+
+    await stateful.execute(`use ${database}`)
+    const r = (await stateful.execute(`select * from ${table} where emp_no = 0`)) as Row[]
+    expect(r.length).toEqual(1)
+
+    await stateful.close()
+  })
+
+  test('stateful connection use after close', async () => {
+    const conn = connect({ url: databaseURL, database: database, fetch, debug: true })
+    const stateful = await conn.persist()
+
+    const r1 = (await stateful.execute(`select * from ${table} where emp_no = 0`)) as Row[]
+    expect(r1.length).toEqual(1)
+
+    await stateful.close()
+
+    await expect(stateful.execute(`select * from ${table} where emp_no = 0`)).rejects.toThrow()
+
+    // original connection should still work
+    const r2 = (await conn.execute(`select * from ${table} where emp_no = 0`)) as Row[]
+    expect(r2.length).toEqual(1)
+  })
 })

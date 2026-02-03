@@ -45,10 +45,9 @@ export class Tx<T extends Config> {
   async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
-    options: E = defaultExecuteOptions as E,
-    txOptions: TxOptions = {}
+    options: E = defaultExecuteOptions as E
   ): Promise<ExecuteResult<E, T>> {
-    return this.conn.execute(query, args, options, txOptions)
+    return this.conn.execute(query, args, options)
   }
 
   async commit(): Promise<T['fullResult'] extends true ? FullResult : Row[]> {
@@ -104,15 +103,23 @@ export class Connection<T extends Config> {
   async begin(txOptions: TxOptions = {}) {
     const conn = new Connection<T>(this.config)
     const tx = new Tx<T>(conn)
-    await tx.execute<T>('BEGIN', undefined, undefined, txOptions)
+    await conn.execute('BEGIN', undefined, undefined, txOptions)
     return tx
+  }
+
+  async persist() {
+    const conn = new Connection<T>(this.config)
+    await conn.execute('', null, defaultExecuteOptions as ExecuteOptions, {}, 'open')
+    const stateful = new StatefulConnection<T>(conn)
+    return stateful
   }
 
   async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
-    txOptions: TxOptions = {}
+    txOptions: TxOptions = {},
+    statefulAction?: 'open' | 'close'
   ): Promise<ExecuteResult<E, T>> {
     const sql = args ? format(query, args) : query
     const body = JSON.stringify({ query: sql })
@@ -125,7 +132,8 @@ export class Connection<T extends Config> {
       body,
       this.session ?? '',
       sql == 'BEGIN' ? txOptions.isolation : null,
-      debug
+      debug,
+      statefulAction
     )
 
     this.session = resp?.session ?? null
@@ -156,6 +164,26 @@ export class Connection<T extends Config> {
     }
 
     return rows as ExecuteResult<E, T>
+  }
+}
+
+export class StatefulConnection<T extends Config> {
+  private conn: Connection<T>
+
+  constructor(conn: Connection<T>) {
+    this.conn = conn
+  }
+
+  async execute<E extends ExecuteOptions>(
+    query: string,
+    args: ExecuteArgs = null,
+    options: E = defaultExecuteOptions as E
+  ): Promise<ExecuteResult<E, T>> {
+    return this.conn.execute(query, args, options)
+  }
+
+  async close(): Promise<void> {
+    await this.conn.execute('', null, defaultExecuteOptions as ExecuteOptions, {}, 'close')
   }
 }
 
