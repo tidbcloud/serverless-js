@@ -46,9 +46,8 @@ export class Tx<T extends Config> {
     query: string,
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
-    txOptions: TxOptions = {}
   ): Promise<ExecuteResult<E, T>> {
-    return this.conn.execute(query, args, options, txOptions)
+    return this.conn.execute(query, args, options)
   }
 
   async commit(): Promise<T['fullResult'] extends true ? FullResult : Row[]> {
@@ -104,14 +103,14 @@ export class Connection<T extends Config> {
   async begin(txOptions: TxOptions = {}) {
     const conn = new Connection<T>(this.config)
     const tx = new Tx<T>(conn)
-    await tx.execute<T>('BEGIN', undefined, undefined, txOptions)
+    await conn.execute<T>('BEGIN', undefined, undefined, txOptions)
     return tx
   }
 
-  async stateful() {
+  async persist() {
     const conn = new Connection<T>(this.config)
     await conn.execute('', null, defaultExecuteOptions as ExecuteOptions, {}, 'open')
-    const stateful = new Stateful<T>(conn)
+    const stateful = new StatefulConnection<T>(conn)
     return stateful
   }
 
@@ -172,7 +171,7 @@ export class Connection<T extends Config> {
   }
 }
 
-export class Stateful<T extends Config> {
+export class StatefulConnection<T extends Config> {
   private conn: Connection<T>
 
   constructor(conn: Connection<T>) {
@@ -183,9 +182,8 @@ export class Stateful<T extends Config> {
     query: string,
     args: ExecuteArgs = null,
     options: E = defaultExecuteOptions as E,
-    txOptions: TxOptions = {}
   ): Promise<ExecuteResult<E, T>> {
-    return this.conn.execute(query, args, options, txOptions)
+    return this.conn.execute(query, args, options)
   }
 
   async close(): Promise<void> {

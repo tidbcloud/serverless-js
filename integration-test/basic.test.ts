@@ -215,7 +215,7 @@ describe('basic', () => {
 
   test('stateful connection normal flow', async () => {
     const conn = connect({ url: databaseURL, database: database, fetch, debug: true })
-    const stateful = await conn.stateful()
+    const stateful = await conn.persist()
 
     await stateful.execute(`use mysql`)
     await expect(stateful.execute(`select * from ${table} where emp_no = 0`)).rejects.toThrow()
@@ -229,7 +229,7 @@ describe('basic', () => {
 
   test('stateful connection use after close', async () => {
     const conn = connect({ url: databaseURL, database: database, fetch, debug: true })
-    const stateful = await conn.stateful()
+    const stateful = await conn.persist()
 
     const r1 = (await stateful.execute(`select * from ${table} where emp_no = 0`)) as Row[]
     expect(r1.length).toEqual(1)

@@ -42,7 +42,7 @@ If you want to keep session state across multiple queries, create a stateful con
 import { connect } from '@tidbcloud/serverless'
 
 const conn = connect({url: 'mysql://username:password@host/database'})
-const stateful = await conn.stateful()
+const stateful = await conn.persist()
 
 try {
   const r1 = await stateful.execute('use db2')
