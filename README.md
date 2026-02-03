@@ -58,7 +58,7 @@ You can also perform interactive transactions with the serverless driver. For ex
 
 > **Note:**
 > 
-> Transactions idle for 10 minutes will be rolled back automatically if it has not been commited or rolled back.
+> Transactions idle for 10 minutes will be rolled back automatically if it has not been committed or rolled back.
 > The transaction is not concurrent-safe. You are not allowed to run SQLs parallel in the same transaction.
 
 ```ts

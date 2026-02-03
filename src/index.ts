@@ -103,7 +103,7 @@ export class Connection<T extends Config> {
   async begin(txOptions: TxOptions = {}) {
     const conn = new Connection<T>(this.config)
     const tx = new Tx<T>(conn)
-    await conn.execute<T>('BEGIN', undefined, undefined, txOptions)
+    await conn.execute('BEGIN', undefined, undefined, txOptions)
     return tx
   }
 
@@ -161,10 +161,6 @@ export class Connection<T extends Config> {
         lastInsertId,
         rowCount: rows.length
       } as ExecuteResult<E, T>
-    }
-
-    if (debug) {
-      console.log(`[serverless-js debug] session: ${this.session}`)
     }
 
     return rows as ExecuteResult<E, T>
