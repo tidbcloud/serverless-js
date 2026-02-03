@@ -45,7 +45,7 @@ export class Tx<T extends Config> {
   async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
-    options: E = defaultExecuteOptions as E,
+    options: E = defaultExecuteOptions as E
   ): Promise<ExecuteResult<E, T>> {
     return this.conn.execute(query, args, options)
   }
@@ -181,7 +181,7 @@ export class StatefulConnection<T extends Config> {
   async execute<E extends ExecuteOptions>(
     query: string,
     args: ExecuteArgs = null,
-    options: E = defaultExecuteOptions as E,
+    options: E = defaultExecuteOptions as E
   ): Promise<ExecuteResult<E, T>> {
     return this.conn.execute(query, args, options)
   }
