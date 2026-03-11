@@ -96,6 +96,24 @@ export async function GET(request: NextRequest) {
 
 See [TiDB Cloud Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver#edge-examples) documentation to learn more.
 
+## MCP for AI Agent
+
+> Do not use it in production.
+
+```
+{
+  "mcpServers": {
+    "tidbcloud-serverless-mcp": {
+      "command": "npx",
+      "args": ["-y", "@tidbcloud/serverless-mcp"],
+      "env": {
+        "TIDB_DATABASE_URL": "mysql://<user>:<password>@<host>/<database>"
+      }
+    }
+  }
+}
+```
+
 ## Configuration
 
 See [Configure TiDB Cloud Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver-config).
