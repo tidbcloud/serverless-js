@@ -3,7 +3,6 @@ type Req = {
   headers: Record<string, string>
   body: string
   cache?: RequestCache
-  redirect?: RequestRedirect
 }
 
 type Res = {

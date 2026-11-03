@@ -7,10 +7,10 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
   if (
     typeof host !== 'string' ||
     host.length > 248 || // Leave room for the "http-" gateway prefix.
-    !/^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+tidbcloud\.com$/i.test(host) ||
+    !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.?$/i.test(host) ||
     host.split('.')[0].length > 58
   ) {
-    throw new Error('Invalid host: expected a DNS hostname under .tidbcloud.com')
+    throw new Error('Invalid host: expected a DNS hostname without URL components')
   }
   const url = new URL('/v1beta/sql', `https://http-${host}`)
 
@@ -48,7 +48,6 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
   }
   const response = await fetch(url.toString(), {
     method: 'POST',
-    redirect: 'error',
     body: body,
     headers,
     ...fetchCacheOption
