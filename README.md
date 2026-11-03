@@ -118,6 +118,8 @@ See [TiDB Cloud Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless
 
 See [Configure TiDB Cloud Serverless Driver](https://docs.pingcap.com/tidbcloud/serverless-driver-config).
 
+`host` (including the hostname extracted from `url`) must be a DNS hostname under `.tidbcloud.com`, without a scheme, port, userinfo, or path. The driver validates it before every request and rejects HTTP redirects. Keep connection configuration and custom `fetch` implementations trusted; the domain check does not verify that an endpoint belongs to your account.
+
 ## License
 
 Apache 2.0, see [LICENSE](./LICENSE).
