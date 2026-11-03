@@ -2,6 +2,18 @@ import { Config } from './config.js'
 import { DatabaseError } from './error.js'
 import { Version } from './version.js'
 export async function postQuery<T>(config: Config, body, session = '', isolationLevel = null, debug, statefulAction?: string): Promise<T> {
+  // Validate at the request boundary because getConfig() exposes mutable config.
+  const host = config.host
+  if (
+    typeof host !== 'string' ||
+    host.length > 248 || // Leave room for the "http-" gateway prefix.
+    !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)*\.?$/i.test(host) ||
+    host.split('.')[0].length > 58
+  ) {
+    throw new Error('Invalid host: expected a DNS hostname without URL components')
+  }
+  const url = new URL('/v1beta/sql', `https://http-${host}`)
+
   let fetchCacheOption: Record<string, any> = { cache: 'no-store' }
   // Cloudflare Workers does not support cache now https://github.com/cloudflare/workerd/issues/69
   try {
@@ -16,7 +28,6 @@ export async function postQuery<T>(config: Config, body, session = '', isolation
     console.log(`[serverless-js debug] request id: ${requestId}`)
   }
 
-  const url = new URL('/v1beta/sql', `https://http-${config.host}`)
   const auth = btoa(`${config.username}:${config.password}`)
   const { fetch } = config
   const database = config.database ?? ''
