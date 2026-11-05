@@ -70,6 +70,7 @@ export type ExecuteResult<E extends ExecuteOptions, T extends Config> = E extend
 export class Connection<T extends Config> {
   private config: T
   private session: Session
+  private inFlight = false
 
   constructor(config: T) {
     this.session = null
@@ -121,49 +122,57 @@ export class Connection<T extends Config> {
     txOptions: TxOptions = {},
     statefulAction?: 'open' | 'close'
   ): Promise<ExecuteResult<E, T>> {
-    const sql = args ? format(query, args) : query
-    const body = JSON.stringify({ query: sql })
-    const debug = options.debug ?? this.config.debug ?? false
-    if (debug) {
-      console.log(`[serverless-js debug] sql: ${sql}`)
+    if (this.inFlight) {
+      throw new Error('An operation is already in progress on this connection')
     }
-    const resp = await postQuery<QueryExecuteResponse>(
-      this.config,
-      body,
-      this.session ?? '',
-      sql == 'BEGIN' ? txOptions.isolation : null,
-      debug,
-      statefulAction
-    )
+    this.inFlight = true
+    try {
+      const sql = args ? format(query, args) : query
+      const body = JSON.stringify({ query: sql })
+      const debug = options.debug ?? this.config.debug ?? false
+      if (debug) {
+        console.log(`[serverless-js debug] sql: ${sql}`)
+      }
+      const resp = await postQuery<QueryExecuteResponse>(
+        this.config,
+        body,
+        this.session ?? '',
+        sql == 'BEGIN' ? txOptions.isolation : null,
+        debug,
+        statefulAction
+      )
 
-    this.session = resp?.session ?? null
-    if (this.session === null || this.session === '') {
-      throw new DatabaseError('empty session, please try again', 500, null)
+      this.session = resp?.session ?? null
+      if (this.session === null || this.session === '') {
+        throw new DatabaseError('empty session, please try again', 500, null)
+      }
+
+      const arrayMode = options.arrayMode ?? this.config.arrayMode ?? false
+      const fullResult = options.fullResult ?? this.config.fullResult ?? false
+      const decoders = { ...this.config.decoders, ...options.decoders }
+
+      const fields = resp?.types ?? []
+      const rows = resp ? parse(fields, resp?.rows ?? [], cast, arrayMode, decoders) : []
+
+      if (fullResult) {
+        const rowsAffected = resp?.rowsAffected ?? null
+        const lastInsertId = resp?.sLastInsertID ?? null
+        const typeByName = (acc, { name, type }) => ({ ...acc, [name]: type })
+        const types = fields.reduce<Types>(typeByName, {})
+        return {
+          statement: sql,
+          types,
+          rows,
+          rowsAffected,
+          lastInsertId,
+          rowCount: rows.length
+        } as ExecuteResult<E, T>
+      }
+
+      return rows as ExecuteResult<E, T>
+    } finally {
+      this.inFlight = false
     }
-
-    const arrayMode = options.arrayMode ?? this.config.arrayMode ?? false
-    const fullResult = options.fullResult ?? this.config.fullResult ?? false
-    const decoders = { ...this.config.decoders, ...options.decoders }
-
-    const fields = resp?.types ?? []
-    const rows = resp ? parse(fields, resp?.rows ?? [], cast, arrayMode, decoders) : []
-
-    if (fullResult) {
-      const rowsAffected = resp?.rowsAffected ?? null
-      const lastInsertId = resp?.sLastInsertID ?? null
-      const typeByName = (acc, { name, type }) => ({ ...acc, [name]: type })
-      const types = fields.reduce<Types>(typeByName, {})
-      return {
-        statement: sql,
-        types,
-        rows,
-        rowsAffected,
-        lastInsertId,
-        rowCount: rows.length
-      } as ExecuteResult<E, T>
-    }
-
-    return rows as ExecuteResult<E, T>
   }
 }
 

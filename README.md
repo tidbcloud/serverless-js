@@ -22,6 +22,8 @@ npm install @tidbcloud/serverless
 
 To query from TiDB Serverless, you need to create a connection first. Then you can use the connection to execute raw SQL queries.
 
+Overlapping operations on the same connection are rejected. Await each operation before starting another, or use separate connections for concurrent queries. Each transaction or stateful handle should belong to one logical unit of work; sharing a handle across users does not provide tenant isolation.
+
 ```ts
 import { connect } from '@tidbcloud/serverless'
 
@@ -36,7 +38,7 @@ If you want to keep session state across multiple queries, create a stateful con
 > **Note:**
 > 
 > Connections idle for 10 minutes will be closed automatically.
-> The Stateful connection is not concurrent-safe. You are not allowed to run SQLs parallel in the same stateful connection.
+> Overlapping queries or `close()` on the same stateful connection are rejected. Await each operation before starting another.
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
@@ -59,7 +61,7 @@ You can also perform interactive transactions with the serverless driver. For ex
 > **Note:**
 > 
 > Transactions idle for 10 minutes will be rolled back automatically if it has not been committed or rolled back.
-> The transaction is not concurrent-safe. You are not allowed to run SQLs parallel in the same transaction.
+> Overlapping queries, `commit()`, or `rollback()` on the same transaction are rejected. Await each operation before starting another.
 
 ```ts
 import { connect } from '@tidbcloud/serverless'
