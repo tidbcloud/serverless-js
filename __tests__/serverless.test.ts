@@ -10,6 +10,16 @@ function mockFetch() {
   })
 }
 
+test.each([
+  ["SELECT 'Are you sure?', ?", [' OR 1=1 -- '], "SELECT 'Are you sure?', ' OR 1=1 -- '"],
+  ["SELECT '00:00:00', :id", { '00': ' OR 1=1 -- ', id: 5 }, "SELECT '00:00:00', 5"]
+])('sends SQL with only unquoted placeholders substituted: %s', async (query, args, expected) => {
+  const fetch = mockFetch()
+  const conn = connect({ host, username: 'user', password: 'secret', fetch })
+  await conn.execute(query, args)
+  expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ query: expected })
+})
+
 describe('gateway hostname validation', () => {
   test.each([
     'gateway.tidbcloud.com@evil.com',

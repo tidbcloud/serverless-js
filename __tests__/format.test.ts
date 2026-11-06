@@ -1,6 +1,60 @@
 import { format } from '../src/format'
 
 describe('format', () => {
+  test('does not turn question marks in literals into SQL code', () => {
+    const query = "SELECT * FROM faq WHERE title = 'Are you sure?' AND id = ?"
+    expect(format(query, [' OR 1=1 -- ', 5])).toBe("SELECT * FROM faq WHERE title = 'Are you sure?' AND id = ' OR 1=1 -- '")
+  })
+
+  test('leaves LIKE literals intact and binds the entire pattern separately', () => {
+    expect(format("SELECT '%?%' LIKE ?", ['% OR 1=1 -- %'])).toBe("SELECT '%?%' LIKE '% OR 1=1 -- %'")
+  })
+
+  test('does not substitute named parameters in datetime literals', () => {
+    const query = "SELECT '2024-01-01 00:00:00', :id"
+    expect(format(query, { '00': ' OR 1=1 -- ', id: 5 })).toBe("SELECT '2024-01-01 00:00:00', 5")
+  })
+
+  test.each([
+    "'literal ? :id'",
+    '"literal ? :id"',
+    '`column ? :id`',
+    "'doubled '' ? :id'",
+    '"doubled "" ? :id"',
+    '`doubled `` ? :id`',
+    String.raw`'escaped \' ? :id'`,
+    String.raw`"escaped \" ? :id"`,
+    String.raw`'backslash \\ ? :id'`,
+    '# ? :id\n',
+    '-- ? :id\r\n',
+    '--\t? :id\n',
+    '/* ? :id */',
+    '/* multiline\n\' " ` ? :id */',
+    '/*!80000 ? :id */',
+    '/*+ ? :id */'
+  ])('skips placeholders in %s', (fragment) => {
+    expect(format(`SELECT ${fragment}, ?`, [5])).toBe(`SELECT ${fragment}, 5`)
+    expect(format(`SELECT ${fragment}, :id`, { id: 5 })).toBe(`SELECT ${fragment}, 5`)
+  })
+
+  test.each(["'unfinished ? :id", '"unfinished ? :id', '`unfinished ? :id', '/* unfinished ? :id', '# ? :id', '-- ? :id'])(
+    'does not substitute inside an unterminated quote or comment: %s',
+    (fragment) => {
+      expect(format(`SELECT ${fragment}`, [5])).toBe(`SELECT ${fragment}`)
+      expect(format(`SELECT ${fragment}`, { id: 5 })).toBe(`SELECT ${fragment}`)
+    }
+  )
+
+  test('does not treat subtraction as a line comment', () => {
+    expect(format('SELECT 1--?, :id', [5])).toBe('SELECT 1--5, :id')
+    expect(format('SELECT 1--:id, ?', { id: 5 })).toBe('SELECT 1--5, ?')
+  })
+
+  test('does not scan substituted values for more placeholders', () => {
+    expect(format('SELECT ?, ?', ['? :id', 5])).toBe("SELECT '? :id', 5")
+    expect(format('SELECT :value, :id', { value: '? :id', id: 5 })).toBe("SELECT '? :id', 5")
+  })
+
   describe('format', () => {
     test('does no replacement for missing object key', () => {
       const query = 'select 1 from user where id=:id'
@@ -131,7 +185,7 @@ describe('format', () => {
     test('formats bigint values', () => {
       const query = 'select 1 from user where id=? and id2=?'
       const expected = 'select 1 from user where id=1 and id2=9223372036854775807'
-      expect(format(query, [1n,9223372036854775807n])).toEqual(expected)
+      expect(format(query, [1n, 9223372036854775807n])).toEqual(expected)
     })
   })
 })
