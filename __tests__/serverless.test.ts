@@ -20,6 +20,15 @@ test.each([
   expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ query: expected })
 })
 
+test('rejects executable comments in parameterized queries before sending a request', async () => {
+  const fetch = mockFetch()
+  const conn = connect({ host, username: 'user', password: 'secret', fetch })
+  await expect(conn.execute("SELECT 1 /*! , '*/ ? ' */", [' OR 1=1 -- '])).rejects.toThrow('Executable comments')
+  expect(fetch).not.toHaveBeenCalled()
+  await conn.execute('SELECT 1 /*T![clustered_index] */')
+  expect(JSON.parse(fetch.mock.calls[0][1].body)).toEqual({ query: 'SELECT 1 /*T![clustered_index] */' })
+})
+
 describe('gateway hostname validation', () => {
   test.each([
     'gateway.tidbcloud.com@evil.com',

@@ -30,8 +30,9 @@ describe('format', () => {
     '--\t? :id\n',
     '/* ? :id */',
     '/* multiline\n\' " ` ? :id */',
-    '/*!80000 ? :id */',
-    '/*+ ? :id */'
+    '/*+ ? :id */',
+    '/*T ? :id */',
+    "'/*! ? :id */'"
   ])('skips placeholders in %s', (fragment) => {
     expect(format(`SELECT ${fragment}, ?`, [5])).toBe(`SELECT ${fragment}, 5`)
     expect(format(`SELECT ${fragment}, :id`, { id: 5 })).toBe(`SELECT ${fragment}, 5`)
@@ -42,6 +43,19 @@ describe('format', () => {
     (fragment) => {
       expect(format(`SELECT ${fragment}`, [5])).toBe(`SELECT ${fragment}`)
       expect(format(`SELECT ${fragment}`, { id: 5 })).toBe(`SELECT ${fragment}`)
+    }
+  )
+
+  test('ends line comments only at a line feed', () => {
+    expect(format("SELECT ? -- c\r'\n, ' ? '", [1, ' OR 1=1 -- '])).toBe("SELECT 1 -- c\r'\n, ' ? '")
+    expect(format("SELECT :a # c\r'\n, ' :b '", { a: 1, b: ' OR 1=1 -- ' })).toBe("SELECT 1 # c\r'\n, ' :b '")
+  })
+
+  test.each(["SELECT 1 /*! , '*/ ? ' */", 'SELECT 1 /*!80000 + ? */', "SELECT 1 /*T![clustered_index] , '*/ ? ' */"])(
+    'rejects executable comments: %s',
+    (query) => {
+      expect(() => format(query, [' OR 1=1 -- '])).toThrow('Executable comments')
+      expect(() => format(query.replace('?', ':id'), { id: ' OR 1=1 -- ' })).toThrow('Executable comments')
     }
   )
 

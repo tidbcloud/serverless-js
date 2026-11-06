@@ -31,7 +31,7 @@ const conn = connect({url: 'mysql://username:password@host/database'})
 const results = await conn.execute('select * from test where id = ?',[1])
 ```
 
-Placeholders (`?` or named `:name`) are replaced only outside quoted strings, quoted identifiers, and comments. Do not quote placeholders. For a LIKE pattern, use `conn.execute('SELECT * FROM test WHERE name LIKE ?', ['%search%'])`.
+Placeholders (`?` or named `:name`) are replaced only outside quoted strings, quoted identifiers, and comments. Do not quote placeholders. For a LIKE pattern, use `conn.execute('SELECT * FROM test WHERE name LIKE ?', ['%search%'])`. A query that has parameters must not contain executable comments (`/*! ... */` or `/*T![...] ... */`); `execute` throws an error for such a query. Queries without parameters are sent unchanged.
 
 **Stateful Connection (experimental)**
 

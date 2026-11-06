@@ -42,8 +42,13 @@ function replacePlaceholders(query: string, replace: (placeholder: string) => st
         }
       }
     } else if (char === '#' || (query.startsWith('--', i) && /[\x00-\x20]/.test(query[i + 2] ?? ''))) {
-      while (i < query.length && query[i] !== '\n' && query[i] !== '\r') i++
+      // TiDB ends # and -- comments only at \n; a lone \r stays inside the comment.
+      while (i < query.length && query[i] !== '\n') i++
     } else if (query.startsWith('/*', i)) {
+      // TiDB scans /*! and /*T![feature] contents as SQL, and whether /*T! runs depends on server features.
+      if (query[i + 2] === '!' || query.startsWith('T!', i + 2)) {
+        throw new Error('Executable comments (/*! */ and /*T! */) are not supported in queries with parameters')
+      }
       const end = query.indexOf('*/', i + 2)
       i = end === -1 ? query.length : end + 2
     } else {
